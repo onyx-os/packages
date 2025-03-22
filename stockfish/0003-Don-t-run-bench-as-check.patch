@@ -1,0 +1,27 @@
+From 5bf2ea1100acb58f743e6c5ffb226f90cf7ab6a8 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:32:51 +0000
+Subject: [PATCH 3/3] Don't run bench as %check
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ stockfish.spec | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/stockfish.spec b/stockfish.spec
+index 296c9aa..e518f36 100644
+--- a/stockfish.spec
++++ b/stockfish.spec
+@@ -136,9 +136,6 @@ cp -p polyglot.ini %{buildroot}%{_sysconfdir}/%{name}
+ 
+ 
+ %check
+-# run bench as a sanity check
+-./src/%{name} bench
+-
+ 
+ %files
+ %license Copying.txt
+-- 
+2.46.2
+

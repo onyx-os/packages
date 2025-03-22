@@ -1,0 +1,28 @@
+From 19d4c099d2972c581625372109b177dcd6e20387 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:32:24 +0000
+Subject: [PATCH 1/3] Remove gcc-c++ dep
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ stockfish.spec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/stockfish.spec b/stockfish.spec
+index 7bb9248..68bd7a6 100644
+--- a/stockfish.spec
++++ b/stockfish.spec
+@@ -29,7 +29,7 @@ Source11:        https://bazaar.launchpad.net/~ubuntu-branches/ubuntu/vivid/%{na
+ # polyglot support
+ Source20:        https://raw.githubusercontent.com/mpurland/%{name}/master/polyglot.ini#/%{name}-polyglot.ini
+ 
+-BuildRequires:  gcc-c++
++#BuildRequires:  gcc-c++
+ BuildRequires:  make
+ 
+ #Suggests:       polyglot-chess
+
+base-commit: 52ccdf2308f5f3082fe70ef5144f11e1ac6f1f56
+-- 
+2.46.2
+

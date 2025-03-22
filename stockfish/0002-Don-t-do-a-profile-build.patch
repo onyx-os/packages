@@ -1,0 +1,28 @@
+From 503f8af9bb3743c5f03ff6e1a9ef105f210d5ccd Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:32:38 +0000
+Subject: [PATCH 2/3] Don't do a profile build
+
+Why would you?
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ stockfish.spec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/stockfish.spec b/stockfish.spec
+index 68bd7a6..296c9aa 100644
+--- a/stockfish.spec
++++ b/stockfish.spec
+@@ -121,7 +121,7 @@ sed -e 's,\(EngineDir = \).*,\1%{_bindir},' \
+ sed -r -i 's/-O3//' src/Makefile
+ %endif
+ %endif
+-%make_build -C src profile-build ARCH=%sfarch \
++%make_build -C src all ARCH=%sfarch \
+     EXTRACXXFLAGS="%{build_cxxflags}" \
+     EXTRALDFLAGS="%{build_ldflags}"
+ 
+-- 
+2.46.2
+

@@ -1,0 +1,2 @@
+origin: https://src.fedoraproject.org/rpms/stockfish.git
+base-commit: 52ccdf2308f5f3082fe70ef5144f11e1ac6f1f56
