@@ -1,0 +1,26 @@
+From c87a5809e7314d30c43c24e7878562a23db5615a Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 19:55:51 +0000
+Subject: [PATCH] Remove dependency on perl-generators
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ help2man.spec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/help2man.spec b/help2man.spec
+index d9b56a2..35c57f2 100644
+--- a/help2man.spec
++++ b/help2man.spec
+@@ -16,7 +16,7 @@ Source:         https://ftp.gnu.org/gnu/help2man/help2man-%{version}.tar.xz
+ 
+ BuildRequires:  gcc
+ BuildRequires:  %{__make}
+-BuildRequires:  perl-generators
++#BuildRequires:  perl-generators
+ BuildRequires:  perl(Getopt::Long)
+ BuildRequires:  perl(POSIX)
+ BuildRequires:  perl(Text::ParseWords)
+-- 
+2.46.2
+
