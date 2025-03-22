@@ -1,0 +1,64 @@
+From fc8663e6f19f94e07d657634c6b0b0ccb926f0e9 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 19:58:46 +0000
+Subject: [PATCH] Don't do gpg verification and remove extra build deps
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ findutils.spec | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/findutils.spec b/findutils.spec
+index 3b773f7..82cd227 100644
+--- a/findutils.spec
++++ b/findutils.spec
+@@ -10,7 +10,6 @@ Source0: https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz
+ Source1: https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.xz.sig
+ # From https://savannah.gnu.org/project/release-gpgkeys.php?group=findutils&download=1
+ # which is linked as project keyring on https://savannah.gnu.org/projects/findutils
+-Source2: findutils-keyring.gpg
+ 
+ # do not build locate
+ Patch1:  findutils-4.5.15-no-locate.patch
+@@ -35,16 +34,16 @@ Provides: /bin/find
+ Provides: bundled(gnulib)
+ 
+ BuildRequires: automake
+-BuildRequires: dejagnu
++#BuildRequires: dejagnu
+ BuildRequires: gettext-devel
+ BuildRequires: gcc
+-BuildRequires: git
+-BuildRequires: libselinux-devel
++#BuildRequires: git
++#BuildRequires: libselinux-devel
+ BuildRequires: make
+ BuildRequires: texinfo
+ 
+ # For gpg verification of source tarball
+-BuildRequires: gnupg2
++#BuildRequires: gnupg2
+ 
+ %description
+ The findutils package contains programs which will help you locate
+@@ -58,7 +57,7 @@ You should install findutils because it includes tools that are very
+ useful for finding things on your system.
+ 
+ %prep
+-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
++#%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
+ %autosetup -N -S git
+ 
+ # drop the source code of locate
+@@ -98,7 +97,7 @@ cd build
+ %make_build
+ 
+ %check
+-make %{?_smp_mflags} check -C build V=1
++#make %{?_smp_mflags} check -C build V=1
+ 
+ %install
+ %make_install -C build
+-- 
+2.46.2
+
