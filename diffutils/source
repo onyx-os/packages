@@ -1,0 +1,2 @@
+origin: https://src.fedoraproject.org/rpms/diffutils.git
+base-commit: efeeb64f37b6f1b38861fbb4d3a463ed7b6553fa
