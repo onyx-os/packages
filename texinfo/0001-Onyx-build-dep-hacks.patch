@@ -1,0 +1,37 @@
+From 32d7b8d68a920fa9fd24c72dfe858a057982105b Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:38:36 +0000
+Subject: [PATCH] Onyx build dep hacks
+
+Doesn't quite work, perl deps need to be revisited.
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ texinfo.spec | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/texinfo.spec b/texinfo.spec
+index e0cd174..827a39b 100644
+--- a/texinfo.spec
++++ b/texinfo.spec
+@@ -22,10 +22,11 @@ Patch4: texinfo-7.1-make-tainted-data-safe.patch
+ 
+ BuildRequires: make
+ BuildRequires: gcc
+-BuildRequires: perl-generators
+-BuildRequires: ncurses-devel, help2man, perl(Data::Dumper)
+-BuildRequires: perl(Locale::Messages), perl(Unicode::EastAsianWidth), perl(Text::Unidecode)
+-BuildRequires: perl(Storable), perl(Unicode::Normalize), perl(File::Copy)
++#BuildRequires: perl-generators
++#BuildRequires: ncurses-devel, help2man, perl(Data::Dumper)
++#BuildRequires: perl(Locale::Messages), perl(Unicode::EastAsianWidth), perl(Text::Unidecode)
++#BuildRequires: perl(Storable), perl(Unicode::Normalize), perl(File::Copy)
++BuildRequires: perl, help2man
+ 
+ # Texinfo perl packages are not installed in default perl library dirs
+ %global __provides_exclude ^perl\\(.*Texinfo.*\\)$
+
+base-commit: 2e1f29c4328a5d3014c213872d0d0daef8961b76
+-- 
+2.46.2
+
