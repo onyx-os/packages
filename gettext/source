@@ -1,0 +1,2 @@
+origin: https://src.fedoraproject.org/rpms/gettext.git
+base-commit: 057981b3714b1206c78ba7db483519ee0066114f

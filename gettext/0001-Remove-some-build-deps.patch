@@ -1,0 +1,178 @@
+From 263495c931d50139728b53506e87bd6ef3ade885 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 20:06:24 +0000
+Subject: [PATCH] Remove some build deps
+
+Including ncurses, libglib (this should be done Soon(tm)).
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ gettext.spec | 83 ++++++++++++++++++++++------------------------------
+ 1 file changed, 35 insertions(+), 48 deletions(-)
+
+diff --git a/gettext.spec b/gettext.spec
+index d329b5a..3a4664c 100644
+--- a/gettext.spec
++++ b/gettext.spec
+@@ -30,12 +30,12 @@ Patch1: gettext-0.21.1-covscan.patch
+ Patch2: gettext-0.22-disable-libtextstyle.patch
+ 
+ # for bootstrapping
+-# BuildRequires: autoconf >= 2.62
++BuildRequires: autoconf >= 2.62
+ BuildRequires: automake
+ BuildRequires: libtool
+-# BuildRequires: bison
++BuildRequires: bison
+ 
+-BuildRequires: gcc-c++
++#BuildRequires: gcc-c++
+ %if %{with java}
+ # libintl.jar requires gcj >= 4.3 to build
+ BuildRequires: gcc-java, libgcj
+@@ -48,29 +48,30 @@ BuildRequires: zip, unzip
+ %endif
+ %endif
+ # for po-mode.el
+-BuildRequires: emacs
++#BuildRequires: emacs
+ # ensure 'ARCHIVE_FORMAT=dirxz'
+ BuildRequires: xz
+ # for documentation
+-BuildRequires: teckit
+-BuildRequires: texlive-dvips
+-BuildRequires: texlive-dvipdfmx
+-BuildRequires: texinfo-tex
+-BuildRequires: texlive-xetex
++#BuildRequires: teckit
++#BuildRequires: texlive-dvips
++#BuildRequires: texlive-dvipdfmx
++#BuildRequires: texinfo-tex
++#BuildRequires: texlive-xetex
+ # following suggested by DEPENDENCIES:
+-BuildRequires: ncurses-devel
++# TODO: Package ncurses
++#BuildRequires: ncurses-devel
+ BuildRequires: libxml2-devel
+-BuildRequires: glib2-devel
+-BuildRequires: libacl-devel
+-BuildRequires: libunistring-devel
++#BuildRequires: glib2-devel
++#BuildRequires: libacl-devel
++#uildRequires: libunistring-devel
+ # for the tests
+-BuildRequires: glibc-langpack-de
+-BuildRequires: glibc-langpack-en
+-BuildRequires: glibc-langpack-fa
+-BuildRequires: glibc-langpack-fr
+-BuildRequires: glibc-langpack-ja
+-BuildRequires: glibc-langpack-tr
+-BuildRequires: glibc-langpack-zh
++#BuildRequires: glibc-langpack-de
++#BuildRequires: glibc-langpack-en
++#BuildRequires: glibc-langpack-fa
++#BuildRequires: glibc-langpack-fr
++#BuildRequires: glibc-langpack-ja
++#BuildRequires: glibc-langpack-tr
++#BuildRequires: glibc-langpack-zh
+ BuildRequires: make
+ Provides: bundled(gnulib)
+ Requires: %{name}-runtime = %{version}-%{release}
+@@ -175,18 +176,6 @@ developing or compiling applications/libraries that needs text
+ styling.
+ %endif
+ 
+-%package -n emacs-%{name}
+-Summary: Support for editing po files within GNU Emacs
+-BuildArch: noarch
+-# help users find po-mode.el
+-Provides: emacs-po-mode
+-Requires: emacs(bin) >= %{_emacs_version}
+-Provides: emacs-%{name}-el = %{version}-%{release}
+-Obsoletes: emacs-%{name}-el < %{version}-%{release}
+-
+-%description -n emacs-%{name}
+-This package provides a major mode for editing po files within GNU Emacs.
+-
+ %package -n msghack
+ Summary: Alter PO files in ways
+ BuildArch: noarch
+@@ -210,7 +199,7 @@ Substitutes the values of environment variables.
+ %if %{without libtextstyle}
+ %patch 2 -p1 -b .orig~
+ %endif
+-autoreconf
++autoreconf -fi
+ 
+ # Defeat libtextstyle attempt to bundle libxml2.  The comments
+ # indicate this is done because the libtextstyle authors do not want
+@@ -243,7 +232,7 @@ export CFLAGS="$CFLAGS -Wformat"
+ %else
+     --disable-java --disable-native-java \
+ %endif
+-    --with-xz
++    --with-xz --disable-more-warnings
+ 
+ # Eliminate hardcoded rpaths; workaround libtool reordering -Wl,--as-needed
+ # after all the libraries.
+@@ -265,7 +254,8 @@ install -pm 755 %SOURCE2 ${RPM_BUILD_ROOT}%{_bindir}/msghack
+ install -pm 644 %SOURCE3 ${RPM_BUILD_ROOT}%{_mandir}/man1/msghack.1
+ 
+ # make preloadable_libintl.so executable
+-chmod 755 ${RPM_BUILD_ROOT}%{_libdir}/preloadable_libintl.so
++# We don't have preloadable_libintl.so, for some reason
++#chmod 755 ${RPM_BUILD_ROOT}%{_libdir}/preloadable_libintl.so
+ 
+ rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
+ 
+@@ -301,17 +291,15 @@ rm -f ${RPM_BUILD_ROOT}%{_datadir}/%{name}/gettext.jar
+ # own this directory for third-party *.its files
+ mkdir -p $RPM_BUILD_ROOT%{_datadir}/%{name}/its
+ 
+-# remove .la files
+-rm ${RPM_BUILD_ROOT}%{_libdir}/lib*.la
+-
+ # remove internal .so lib files
+-rm ${RPM_BUILD_ROOT}%{_libdir}/libgettext{src,lib}.so
++rm ${RPM_BUILD_ROOT}%{_libdir}/libgettextsrc.so
++rm ${RPM_BUILD_ROOT}%{_libdir}/libgettextlib.so
+ 
+ # move po-mode initialization elisp file to the right place, and remove byte
+ # compiled file
+-install -d ${RPM_BUILD_ROOT}%{_emacs_sitestartdir}
+-mv ${RPM_BUILD_ROOT}%{_emacs_sitelispdir}/%{name}/start-po.el ${RPM_BUILD_ROOT}%{_emacs_sitestartdir}
+-rm ${RPM_BUILD_ROOT}%{_emacs_sitelispdir}/%{name}/start-po.elc
++#install -d ${RPM_BUILD_ROOT}%{_emacs_sitestartdir}
++#mv ${RPM_BUILD_ROOT}%{_emacs_sitelispdir}/%{name}/start-po.el ${RPM_BUILD_ROOT}%{_emacs_sitestartdir}
++#rm ${RPM_BUILD_ROOT}%{_emacs_sitelispdir}/%{name}/start-po.elc
+ 
+ %find_lang %{name}-runtime
+ %find_lang %{name}-tools
+@@ -414,7 +402,6 @@ make check LIBUNISTRING=-lunistring
+ %{_infodir}/autosprintf*
+ %{_libdir}/libasprintf.so
+ %{_libdir}/libgettextpo.so
+-%{_libdir}/preloadable_libintl.so
+ %{_mandir}/man1/autopoint.1*
+ %{_mandir}/man1/gettextize.1*
+ %{_mandir}/man3/*
+@@ -445,11 +432,11 @@ make check LIBUNISTRING=-lunistring
+ %{_libdir}/libtextstyle.so
+ %endif
+ 
+-%files -n emacs-%{name}
+-%dir %{_emacs_sitelispdir}/%{name}
+-%{_emacs_sitelispdir}/%{name}/*.elc
+-%{_emacs_sitelispdir}/%{name}/*.el
+-%{_emacs_sitestartdir}/*.el
++#%files -n emacs-%{name}
++#%dir %{_emacs_sitelispdir}/%{name}
++#%{_emacs_sitelispdir}/%{name}/*.elc
++#%{_emacs_sitelispdir}/%{name}/*.el
++#%{_emacs_sitestartdir}/*.el
+ 
+ %files -n msghack
+ %license COPYING
+-- 
+2.46.2
+
