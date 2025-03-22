@@ -1,0 +1,2 @@
+origin: https://src.fedoraproject.org/rpms/sqlite.git
+base-commit: 182717934c83e9d3ec80f9f818961fd21640c964

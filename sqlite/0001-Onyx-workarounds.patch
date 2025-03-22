@@ -1,0 +1,67 @@
+From ea564597e6b24c5f308b49516138059100a292d4 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:29:56 +0000
+Subject: [PATCH] Onyx workarounds
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ sqlite.spec | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/sqlite.spec b/sqlite.spec
+index edfaa0b..e8a97e3 100644
+--- a/sqlite.spec
++++ b/sqlite.spec
+@@ -2,7 +2,7 @@
+ %bcond_without tcl
+ %bcond_without sqldiff
+ %bcond_with static
+-%bcond_without check
++%bcond_with check
+ 
+ %define realver 3470200
+ %define docver 3470200
+@@ -26,10 +26,10 @@ Patch3: sqlite-3.47.0-Backport-FTS3-corruption-test-fix-for-big-endian.patch
+ 
+ BuildRequires: make
+ BuildRequires: gcc
+-BuildRequires: ncurses-devel readline-devel glibc-devel
++#BuildRequires: ncurses-devel readline-devel glibc-devel
+ BuildRequires: autoconf
+ BuildRequires: /usr/bin/tclsh
+-BuildRequires: zlib-ng-compat-devel
++BuildRequires: zlib-devel
+ %if %{with tcl}
+ BuildRequires: tcl-devel
+ %{!?tcl_version: %global tcl_version 8.6}
+@@ -183,7 +183,7 @@ rm test/func4.test
+ rm -f %{name}-doc-%{docver}/sqlite.css~ || :
+ 
+ autoupdate
+-autoconf # Rerun with new autoconf to add support for aarm64
++autoreconf -fi
+ 
+ %build
+ # First build executable for debug subpackage
+@@ -277,7 +277,7 @@ install -D -m0755 sqldiff $RPM_BUILD_ROOT/%{_bindir}/sqldiff
+ %endif
+ 
+ %if ! %{with static}
+-rm -f $RPM_BUILD_ROOT/%{_libdir}/*.{la,a}
++rm -f $RPM_BUILD_ROOT/%{_libdir}/*.a
+ %endif
+ 
+ %if %{with check}
+@@ -313,7 +313,6 @@ make test
+ %{_libdir}/pkgconfig/*.pc
+ %if %{with static}
+ %{_libdir}/*.a
+-%exclude %{_libdir}/*.la
+ %endif
+ 
+ %files doc
+
+base-commit: 182717934c83e9d3ec80f9f818961fd21640c964
+-- 
+2.46.2
+
