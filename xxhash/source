@@ -1,0 +1,2 @@
+origin: https://src.fedoraproject.org/rpms/xxhash.git
+base-commit: c5adea3ab45796ea12519d6d23f7fde6cbed63be

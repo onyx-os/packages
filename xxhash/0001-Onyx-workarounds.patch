@@ -1,0 +1,99 @@
+From 1d1b40269fc48d425b9c60ac0c4783e69aa61f8a Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:43:31 +0000
+Subject: [PATCH] Onyx workarounds
+
+Add onyx-specific patch and work around doxygen.
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ onyx-install.patch | 13 +++++++++++++
+ xxhash.spec        | 23 ++++++++++++-----------
+ 2 files changed, 25 insertions(+), 11 deletions(-)
+ create mode 100644 onyx-install.patch
+
+diff --git a/onyx-install.patch b/onyx-install.patch
+new file mode 100644
+index 0000000..d7948ef
+--- /dev/null
++++ b/onyx-install.patch
+@@ -0,0 +1,13 @@
++Index: xxHash-0.8.3/Makefile
++===================================================================
++--- xxHash-0.8.3.orig/Makefile
+++++ xxHash-0.8.3/Makefile
++@@ -539,7 +539,7 @@ lint-unicode:
++ # =========================================================
++ # make install is validated only for the following targets
++ # =========================================================
++-ifneq (,$(filter Linux Darwin GNU/kFreeBSD GNU Haiku OpenBSD FreeBSD NetBSD DragonFly SunOS CYGWIN% , $(UNAME)))
+++ifneq (,$(filter Linux Darwin GNU/kFreeBSD GNU Haiku Onyx OpenBSD FreeBSD NetBSD DragonFly SunOS CYGWIN% , $(UNAME)))
++ 
++ DESTDIR     ?=
++ # directory variables: GNU conventions prefer lowercase
+diff --git a/xxhash.spec b/xxhash.spec
+index 71a56b9..5506bcc 100644
+--- a/xxhash.spec
++++ b/xxhash.spec
+@@ -8,10 +8,10 @@ Summary:	Extremely fast hash algorithm
+ License:	BSD-2-Clause AND GPL-2.0-or-later
+ URL:		https://www.xxhash.com/
+ Source0:	https://github.com/Cyan4973/xxHash/archive/v%{version}/%{name}-%{version}.tar.gz
+-
++Patch0:         onyx-install.patch
+ BuildRequires:	make
+ BuildRequires:	gcc
+-BuildRequires:	doxygen
++# BuildRequires:	doxygen
+ 
+ %description
+ xxHash is an Extremely fast Hash algorithm, running at RAM speed
+@@ -42,16 +42,17 @@ Provides:	%{name}-static = %{version}-%{release}
+ %description devel
+ Development files for the xxhash library
+ 
+-%package doc
+-Summary:	Extremely fast hash algorithm - documentation files
+-License:	BSD-2-Clause
+-BuildArch:	noarch
++#%package doc
++#Summary:	Extremely fast hash algorithm - documentation files
++#License:	BSD-2-Clause
++#BuildArch:	noarch
+ 
+-%description doc
+-Documentation files for the xxhash library
++#%description doc
++#Documentation files for the xxhash library
+ 
+ %prep
+ %setup -q -n xxHash-%{version}
++%patch -p1 0
+ 
+ %build
+ # Enable runtime detection of sse2/avx2/avx512 on intel architectures
+@@ -69,7 +70,7 @@ Documentation files for the xxhash library
+     MOREFLAGS="%{__global_cflags} %{?__global_ldflags} %{moreflags_dispatch}" \
+     DISPATCH=%{dispatch} \
+     LIBXXH_DISPATCH=%{dispatch}
+-doxygen
++# doxygen
+ 
+ %install
+ %make_install \
+@@ -103,8 +104,8 @@ make test-xxhsum-c
+ %{_libdir}/libxxhash.so
+ %{_libdir}/pkgconfig/libxxhash.pc
+ 
+-%files doc
+-%doc doxygen/html
++#%files doc
++#%doc doxygen/html
+ 
+ %changelog
+ * Sun Jan 19 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.8.3-2
+
+base-commit: c5adea3ab45796ea12519d6d23f7fde6cbed63be
+-- 
+2.46.2
+
