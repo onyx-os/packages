@@ -1,0 +1,2 @@
+origin: https://src.fedoraproject.org/rpms/libxml2.git
+base-commit: a93e055a8bb7c8381bc76e4f69c29b96d52884ad

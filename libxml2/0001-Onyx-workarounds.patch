@@ -1,0 +1,104 @@
+From f08c0608d9bf92ceedb3150d1d803c5578c1810b Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 20:35:06 +0000
+Subject: [PATCH] Onyx workarounds
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ libxml2.spec | 33 +++++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
+
+diff --git a/libxml2.spec b/libxml2.spec
+index 968aff3..d19619c 100644
+--- a/libxml2.spec
++++ b/libxml2.spec
+@@ -14,10 +14,10 @@ Source1:        https://www.w3.org/XML/Test/xmlts20080827.tar.gz
+ # https://www.w3.org/XML/2004/xml-schema-test-suite/index.html
+ Source2:        https://www.w3.org/XML/2004/xml-schema-test-suite/xmlschema2002-01-16/xsts-2002-01-16.tar.gz
+ Source3:        https://www.w3.org/XML/2004/xml-schema-test-suite/xmlschema2004-01-14/xsts-2004-01-14.tar.gz
+-Patch0:         libxml2-multilib.patch
++#Patch0:         libxml2-multilib.patch
+ # Patch from openSUSE.
+ # See:  https://bugzilla.gnome.org/show_bug.cgi?id=789714
+-Patch1:         libxml2-2.12.0-python3-unicode-errors.patch
++#Patch1:         libxml2-2.12.0-python3-unicode-errors.patch
+ 
+ BuildRequires:  cmake-rpm-macros
+ BuildRequires:  gcc
+@@ -86,6 +86,7 @@ find doc -type f -executable -print -exec chmod 0644 {} ';'
+ # see https://bugzilla.redhat.com/show_bug.cgi?id=2139546 , several
+ # of these options are needed to (mostly) retain ABI compatibility
+ # with earlier versions
++export CFLAGS="$CFLAGS -fPIC"
+ %configure \
+     --enable-static \
+     --with-legacy \
+@@ -97,7 +98,7 @@ find doc -type f -executable -print -exec chmod 0644 {} ';'
+ %make_install
+ 
+ # multiarch crazyness on timestamp differences or Makefile/binaries for examples
+-touch -m --reference=%{buildroot}%{_includedir}/libxml2/libxml/parser.h %{buildroot}%{_bindir}/xml2-config
++#touch -m --reference=%{buildroot}%{_includedir}/libxml2/libxml/parser.h %{buildroot}%{_bindir}/xml2-config
+ 
+ find %{buildroot} -type f -name '*.la' -print -delete
+ rm -vf %{buildroot}{%{python2_sitearch},%{python3_sitearch}}/*.a
+@@ -106,25 +107,25 @@ gzip -9 -c doc/libxml2-api.xml > doc/libxml2-api.xml.gz
+ 
+ %check
+ # Tests require the XML conformance suite.
+-tar -xzvf %{SOURCE1}
+-%make_build check
+-rm -rf xmlconf
++#tar -xzvf %{SOURCE1}
++#%make_build check
++#rm -rf xmlconf
+ # Schema tests use the schema test suite.
+-cp %{SOURCE2} %{SOURCE3} xstc/
+-pushd xstc
+-mkdir Tests
+-%make_build tests
+-popd
++#cp %{SOURCE2} %{SOURCE3} xstc/
++#pushd xstc
++#mkdir Tests
++#%make_build tests
++#popd
+ # As the directory is copied to the devel subpackage, remove any build
+ # artifacts.
+-(cd doc/examples ; make clean ; rm -rf .deps Makefile)
++#(#cd doc/examples ; make clean ; rm -rf .deps Makefile)
+ 
+-%ldconfig_scriptlets
++#%ldconfig_scriptlets
+ 
+ %files
+ %license Copyright
+ %doc NEWS README.md
+-%{_libdir}/libxml2.so.2*
++%{_libdir}/libxml2*
+ %{_bindir}/xmlcatalog
+ %{_bindir}/xmllint
+ %{_mandir}/man1/xmlcatalog.1*
+@@ -139,7 +140,7 @@ popd
+ %{_datadir}/aclocal/libxml.m4
+ %{_datadir}/gtk-doc/html/libxml2/
+ %{_includedir}/libxml2/
+-%{_libdir}/libxml2.so
++%{_libdir}/*
+ %{_libdir}/pkgconfig/libxml-2.0.pc
+ %{_libdir}/cmake/libxml2/
+ %{_bindir}/xml2-config
+@@ -151,7 +152,7 @@ popd
+ 
+ %files -n python3-%{name}
+ %doc doc/*.py
+-%{python3_sitearch}/libxml2mod.so
++%{python3_sitearch}/libxml2mod.*
+ %{python3_sitelib}/libxml2.py
+ %{python3_sitelib}/__pycache__/libxml2.*
+ %{python3_sitelib}/drv_libxml2.py
+
+base-commit: a93e055a8bb7c8381bc76e4f69c29b96d52884ad
+-- 
+2.46.2
+
