@@ -1,0 +1,2 @@
+origin: https://src.fedoraproject.org/rpms/vim.git
+base-commit: 2b538aae6bc79546ce0145edde2dbc840281a25d

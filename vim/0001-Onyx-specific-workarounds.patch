@@ -1,0 +1,172 @@
+From e62958b784044cf1fa24025853aa08677fc12874 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:41:18 +0000
+Subject: [PATCH] Onyx specific workarounds
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ vim.spec | 47 +++++++++++++++++++++++++----------------------
+ 1 file changed, 25 insertions(+), 22 deletions(-)
+
+diff --git a/vim.spec b/vim.spec
+index ba1aa988..e1f4c4e9 100644
+--- a/vim.spec
++++ b/vim.spec
+@@ -1,4 +1,4 @@
+-%bcond_without gui
++%bcond_with gui
+ 
+ %if 0%{?fedora}
+ %bcond_without default_editor
+@@ -12,8 +12,10 @@
+ 
+ %define patchlevel 919
+ 
+-%if %{?WITH_SELINUX:0}%{!?WITH_SELINUX:1}
++%if 0
+ %define WITH_SELINUX 1
++%else
++%define WITH_SELINUX 0
+ %endif
+ 
+ %if %{with gui}
+@@ -31,8 +33,9 @@
+ %define withvimspell 0
+ %define withhunspell 0
+ %define withlua 1
+-%define withperl 1
+-%if 0%{?flatpak}
++# TODO: PERL_LIBS is coming up empty and failing the build, fix...
++%define withperl 0
++%if 1
+ %define withruby 0
+ %else
+ %define withruby 1
+@@ -45,6 +48,7 @@
+ %define _fortify_level 1
+ 
+ %define baseversion 9.1
++%define vimdir2 vim-9.1.0%{patchlevel}
+ %define vimdir vim91
+ 
+ Summary: The VIM editor
+@@ -62,7 +66,7 @@ Epoch: 2
+ # resolution: take it as OPUBL-1.0, the license won't be added to allowed license list, but if a project uses it for documentation
+ # and don't use license options mentioned in the OPUBL 1.0 license text (which both are the case for Vim), the license is allowed
+ License: Vim AND LGPL-2.1-or-later AND MIT AND GPL-1.0-only AND (GPL-2.0-only OR Vim) AND Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND GPL-2.0-or-later AND GPL-3.0-or-later AND OPUBL-1.0 AND Apache-2.0 WITH Swift-exception
+-Source0: ftp://ftp.vim.org/pub/vim/unix/vim-%{baseversion}-%{patchlevel}.tar.bz2
++Source0: https://github.com/vim/vim/archive/refs/tags/v9.1.0919.tar.gz
+ Source1: virc
+ Source2: vimrc
+ Source3: gvim16.png
+@@ -118,14 +122,14 @@ BuildRequires: gettext
+ # glibc in F35 bootstraped several conversion formats from
+ # iconv into a separate package. Vim needs those additional
+ # formats during compilation.
+-BuildRequires: glibc-gconv-extra
++#BuildRequires: glibc-gconv-extra
+ 
+ %if %{with gpm}
+ # for mouse support in console
+ BuildRequires: gpm-devel
+ %endif
+ # for setting ACL on created files
+-BuildRequires: libacl-devel
++#BuildRequires: libacl-devel
+ 
+ # selinux support
+ %if %{WITH_SELINUX}
+@@ -142,22 +146,22 @@ BuildRequires: libtool
+ 
+ # for lua plugin
+ %if "%{withlua}" == "1"
+-BuildRequires: lua-devel
++#BuildRequires: lua-devel
+ %endif
+ 
+ # uses make
+ BuildRequires: make
+ # screen handling library
+-BuildRequires: ncurses-devel
++#BuildRequires: ncurses-devel
+ # for perl plugin
+ %if "%{withperl}" == "1"
+-BuildRequires: perl-devel
+-BuildRequires: perl-generators
+-BuildRequires: perl(ExtUtils::Embed)
+-BuildRequires: perl(ExtUtils::ParseXS)
++#BuildRequires: perl-devel
++#BuildRequires: perl-generators
++#BuildRequires: perl(ExtUtils::Embed)
++#BuildRequires: perl(ExtUtils::ParseXS)
+ %endif
+ # for python plugin
+-BuildRequires: python3-devel
++#BuildRequires: python3-devel
+ 
+ # for ruby plugin
+ %if "%{withruby}" == "1"
+@@ -183,7 +187,6 @@ Requires: %{name}-data = %{epoch}:%{version}-%{release}
+ Requires: %{name}-filesystem
+ # the hexdump binary was part of the package for long time, ship it with it
+ # still for convenience
+-Requires: xxd
+ # vim-toml was a separate package but the runtime files have been included
+ # directly in vim since 8.2.3519.  The vim-toml package has been retired in
+ # Fedora, obsolete it so it doesn't get left on users' systems.  Added in F38,
+@@ -243,7 +246,7 @@ Provides: %{_bindir}/mergetool
+ Provides: %{_bindir}/vim
+ Requires: vim-common = %{epoch}:%{version}-%{release}
+ # required for vimtutor (#395371)
+-Requires: which
++#Requires: which
+ # suggest python3, python2, lua, ruby and perl packages because of their 
+ # embedded functionality in Vim/GVim
+ %if "%{withlua}" == "1"
+@@ -399,7 +402,7 @@ a hex dump back to its original binary form.
+ 
+ 
+ %prep
+-%setup -q -b 0 -n %{vimdir}
++%setup -q -b 0 -n %{vimdir2}
+ 
+ # use %%{__python3} macro for defining shebangs in python3 tests
+ sed -i -e 's,/usr/bin/python3,%{__python3},' %{PATCH3005}
+@@ -542,10 +545,9 @@ make clean
+  --disable-tclinterp \
+  --with-x=no \
+  --enable-gui=no --exec-prefix=%{_prefix} --enable-multibyte \
+- --enable-cscope --with-modified-by="<bugzilla@redhat.com>" \
++ --enable-cscope \
+  --with-tlib=ncurses \
+  --enable-fips-warning \
+- --with-compiledby="<bugzilla@redhat.com>" \
+ %if %{with gpm}
+  --enable-gpm \
+ %else
+@@ -605,7 +607,8 @@ cd src
+ %make_install BINDIR=%{_bindir} STRIP=/bin/true
+ # make install creates vim binary and view symlink, they will be wrappers
+ # so remove them here
+-rm -f %{buildroot}%{_bindir}/{vim,view}
++rm -f %{buildroot}%{_bindir}/vim
++rm -f %{buildroot}%{_bindir}/view
+ mkdir -p %{buildroot}%{_datadir}/icons/hicolor/{16x16,32x32,48x48,64x64}/apps
+ mkdir -p %{buildroot}%{_libexecdir}
+ install -m755 minimal-vim %{buildroot}%{_libexecdir}/vi
+@@ -697,8 +700,8 @@ echo ".so man1/vimtutor.1" > %{buildroot}/%{_mandir}/man1/gvimtutor.1
+ %else
+ # Remove files included in X11 subpackage, but built by default:
+ rm %{buildroot}/%{_mandir}/man1/evim.*
+-rm %{buildroot}/%{_datadir}/applications/{vim,gvim}.desktop
+-rm %{buildroot}/%{_datadir}/icons/{hicolor,locolor}/*/apps/gvim.png
++rm %{buildroot}/%{_datadir}/applications/*vim.desktop
++rm %{buildroot}/%{_datadir}/icons/*/*/apps/gvim.png
+ %endif
+ 
+ ( cd %{buildroot}
+
+base-commit: 2b538aae6bc79546ce0145edde2dbc840281a25d
+-- 
+2.46.2
+
