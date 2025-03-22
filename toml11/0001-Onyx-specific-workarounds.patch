@@ -1,0 +1,61 @@
+From c09b4cb94833ac083756bf99c3227dcd69340e61 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:40:13 +0000
+Subject: [PATCH] Onyx specific workarounds
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ toml11.spec | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/toml11.spec b/toml11.spec
+index d2a3c35..6971422 100644
+--- a/toml11.spec
++++ b/toml11.spec
+@@ -18,8 +18,9 @@ Source0:    %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+ Patch:      0001-fix-add-missing-zero-initialization-to-region.patch
+ 
+ BuildRequires: cmake
+-BuildRequires: gcc-c++
+-BuildRequires: ninja-build
++BuildRequires: gcc
++#BuildRequires: gcc-c++
++#BuildRequires: ninja-build
+ 
+ %if %{with test}
+ BuildRequires: boost-devel
+@@ -55,6 +56,7 @@ Provides:   %{name}-static = %{version}-%{release}
+ 
+ Development files for %{name}.
+ 
++%global _default_patch_fuzz 2
+ 
+ %prep
+ %autosetup -p1
+@@ -62,17 +64,16 @@ Development files for %{name}.
+ 
+ %build
+ %cmake \
+-    -G Ninja \
+     %if %{with test}
+     -Dtoml11_BUILD_TEST=ON \
+     %endif
+-    %{nil}
+-%cmake_build
++    -DCMAKE_INSTALL_PREFIX=/usr \
++    .
++%make_build
+ 
+ 
+ %install
+-%cmake_install
+-
++%make_install
+ 
+ %files devel
+ %license LICENSE
+
+base-commit: 038fd38f664889f5306c811ce52911e756682312
+-- 
+2.46.2
+
