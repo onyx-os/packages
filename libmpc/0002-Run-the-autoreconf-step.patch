@@ -1,0 +1,35 @@
+From 5f825ee3a56a96ebfbed65261530b7baa2fdf563 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 20:13:32 +0000
+Subject: [PATCH 2/2] Run the autoreconf step
+
+We need it for libtool updating.
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ libmpc.spec | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/libmpc.spec b/libmpc.spec
+index 3072e78..590bbf7 100644
+--- a/libmpc.spec
++++ b/libmpc.spec
+@@ -19,6 +19,7 @@ BuildRequires: gcc
+ BuildRequires: gmp-devel >= 5.0.0
+ BuildRequires: mpfr-devel >= 4.1.0
+ BuildRequires: make
++BuildRequires: autoconf, automake, libtool
+ 
+ %if 0%{?bootstrap} == 0
+ Obsoletes: compat-libmpc < %{version}-1
+@@ -62,6 +63,7 @@ Contains the .so files for mpc version %{bootstrap-version}.
+ %endif
+ 
+ %build
++autoreconf -fi
+ %configure --disable-static
+ 
+ # Get rid of undesirable hardcoded rpaths; workaround libtool reordering
+-- 
+2.46.2
+
