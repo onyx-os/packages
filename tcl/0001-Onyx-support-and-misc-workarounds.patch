@@ -1,0 +1,91 @@
+From 2c15e3ab1eb429cee523129851f8c506ef5be347 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:31:04 +0000
+Subject: [PATCH] Onyx support and misc workarounds
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ onyx-support.patch | 13 +++++++++++++
+ tcl.spec           | 21 +++++++--------------
+ 2 files changed, 20 insertions(+), 14 deletions(-)
+ create mode 100644 onyx-support.patch
+
+diff --git a/onyx-support.patch b/onyx-support.patch
+new file mode 100644
+index 0000000..51d6b5a
+--- /dev/null
++++ b/onyx-support.patch
+@@ -0,0 +1,13 @@
++Index: tcl8.6.15/unix/tcl.m4
++===================================================================
++--- tcl8.6.15.orig/unix/tcl.m4
+++++ tcl8.6.15/unix/tcl.m4
++@@ -1368,7 +1368,7 @@ AC_DEFUN([SC_CONFIG_CFLAGS], [
++ 		])
++ 	    ])
++ 	    ;;
++-	Linux*|GNU*|NetBSD-Debian|DragonFly-*|FreeBSD-*)
+++	Linux*|GNU*|NetBSD-Debian|DragonFly-*|FreeBSD-*|Onyx*)
++ 	    SHLIB_CFLAGS="-fPIC -fno-common"
++ 	    SHLIB_SUFFIX=".so"
++ 
+diff --git a/tcl.spec b/tcl.spec
+index 9b3a6a5..9aed0bc 100644
+--- a/tcl.spec
++++ b/tcl.spec
+@@ -1,6 +1,5 @@
+ %define majorver 8.6
+ %define	vers %{majorver}.15
+-%{!?sdt:%define sdt 1}
+ 
+ Summary: Tool Command Language, pronounced tickle
+ Name: tcl
+@@ -21,11 +20,7 @@ Patch0: tcl-8.6.15-autopath.patch
+ Patch1: tcl-8.6.15-conf.patch
+ Patch3: tcl-8.6.13-tcltests-path-fix.patch
+ Patch4: tcl-8.6.13-configure-c99.patch
+-
+-%if %sdt
+-BuildRequires: systemtap-sdt-dtrace
+-BuildRequires: systemtap-sdt-devel
+-%endif
++Patch5: onyx-support.patch
+ 
+ %description
+ The Tcl (Tool Command Language) provides a powerful platform for
+@@ -64,12 +59,9 @@ The package contains the development files and man pages for tcl.
+ rm -r compat/zlib
+ 
+ %build
+-pushd unix
+-autoconf
++cd unix
++autoreconf -fi
+ %configure \
+-%if %sdt
+---enable-dtrace \
+-%endif
+ --enable-threads \
+ --enable-symbols \
+ --enable-shared
+@@ -99,11 +91,12 @@ mkdir -p %{buildroot}/%{_libdir}/%{name}%{majorver}
+ # paths don't look at /usr/lib for efficiency, so we symlink into tcl8.6 for now
+ ln -s %{_libdir}/%{name}Config.sh %{buildroot}/%{_libdir}/%{name}%{majorver}/%{name}Config.sh
+ 
+-mkdir -p %{buildroot}/%{_includedir}/%{name}-private/{generic,unix}
+-find generic unix -name "*.h" -exec cp -p '{}' %{buildroot}/%{_includedir}/%{name}-private/'{}' ';'
++mkdir -p %{buildroot}/%{_includedir}/%{name}-private/unix
++mkdir -p %{buildroot}/%{_includedir}/%{name}-private/generic
++find generic unix -name "*.h" -exec cp -p {} %{buildroot}/%{_includedir}/%{name}-private/{} \;
+ ( cd %{buildroot}/%{_includedir}
+ 	for i in *.h ; do
+-		[ -f %{buildroot}/%{_includedir}/%{name}-private/generic/$i ] && ln -sf ../../$i %{buildroot}/%{_includedir}/%{name}-private/generic ;
++		[ -f %{buildroot}/%{_includedir}/%{name}-private/generic/$i ] && ln -sfv ../../$i %{buildroot}/%{_includedir}/%{name}-private/generic ;
+ 	done
+ )
+ 
+
+base-commit: 1ec139af5170b3dc01ea34da5d5218c8eefd7d9a
+-- 
+2.46.2
+
