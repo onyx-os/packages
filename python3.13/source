@@ -1,0 +1,2 @@
+origin: https://src.fedoraproject.org/rpms/python3.13.git
+base-commit: 00aa424d30ed176d7fc8c7399e0037a6a6e70c34

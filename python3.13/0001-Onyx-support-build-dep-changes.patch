@@ -1,0 +1,522 @@
+From 6ffc5ac7e5b6e64a444c0647e5675212ba7a9751 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:18:32 +0000
+Subject: [PATCH] Onyx support (+ build dep changes)
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ .pc/.quilt_patches         |   1 +
+ .pc/.quilt_series          |   1 +
+ .pc/.version               |   1 +
+ .pc/applied-patches        |   2 +
+ bldshared.patch            |  31 ++++++++++
+ fixup.patch                |  13 ++++
+ onyx-support.patch         |  22 +++++++
+ platform-triplet-fix.patch |  20 +++++++
+ platform-triplet.patch     |  26 ++++++++
+ python3.13.spec            | 118 ++++++++++++++++++++-----------------
+ 10 files changed, 181 insertions(+), 54 deletions(-)
+ create mode 100644 .pc/.quilt_patches
+ create mode 100644 .pc/.quilt_series
+ create mode 100644 .pc/.version
+ create mode 100644 .pc/applied-patches
+ create mode 100644 bldshared.patch
+ create mode 100644 fixup.patch
+ create mode 100644 onyx-support.patch
+ create mode 100644 platform-triplet-fix.patch
+ create mode 100644 platform-triplet.patch
+
+diff --git a/.pc/.quilt_patches b/.pc/.quilt_patches
+new file mode 100644
+index 0000000..4baccb8
+--- /dev/null
++++ b/.pc/.quilt_patches
+@@ -0,0 +1 @@
++patches
+diff --git a/.pc/.quilt_series b/.pc/.quilt_series
+new file mode 100644
+index 0000000..c206706
+--- /dev/null
++++ b/.pc/.quilt_series
+@@ -0,0 +1 @@
++series
+diff --git a/.pc/.version b/.pc/.version
+new file mode 100644
+index 0000000..0cfbf08
+--- /dev/null
++++ b/.pc/.version
+@@ -0,0 +1 @@
++2
+diff --git a/.pc/applied-patches b/.pc/applied-patches
+new file mode 100644
+index 0000000..cf99316
+--- /dev/null
++++ b/.pc/applied-patches
+@@ -0,0 +1,2 @@
++bldshared.patch
++platform-triplet2.patch
+diff --git a/bldshared.patch b/bldshared.patch
+new file mode 100644
+index 0000000..be039e8
+--- /dev/null
++++ b/bldshared.patch
+@@ -0,0 +1,31 @@
++Index: Python-3.13.1/configure.ac
++===================================================================
++--- Python-3.13.1.orig/configure.ac
+++++ Python-3.13.1/configure.ac
++@@ -3477,7 +3477,7 @@ then
++ 	Emscripten*|WASI*)
++ 		LDSHARED='$(CC) -shared'
++ 		LDCXXSHARED='$(CXX) -shared';;
++-	Linux*|GNU*|QNX*|VxWorks*|Haiku*)
+++	Linux*|GNU*|QNX*|VxWorks*|Haiku*|Onyx*)
++ 		LDSHARED='$(CC) -shared'
++ 		LDCXXSHARED='$(CXX) -shared';;
++ 	FreeBSD*)
++@@ -3558,7 +3558,7 @@ then
++ 		 then CCSHARED="-fPIC";
++ 		 else CCSHARED="+z";
++ 		 fi;;
++-	Linux*|GNU*) CCSHARED="-fPIC";;
+++	Linux*|GNU*|Onyx*) CCSHARED="-fPIC";;
++ 	Emscripten*|WASI*)
++ 		AS_VAR_IF([enable_wasm_dynamic_linking], [yes], [
++ 			CCSHARED="-fPIC"
++@@ -3591,7 +3591,7 @@ then
++ 	    LINKFORSHARED="-Wl,-E -Wl,+s";;
++ #	    LINKFORSHARED="-Wl,-E -Wl,+s -Wl,+b\$(BINLIBDEST)/lib-dynload";;
++ 	Linux-android*) LINKFORSHARED="-pie -Xlinker -export-dynamic";;
++-	Linux*|GNU*) LINKFORSHARED="-Xlinker -export-dynamic";;
+++	Linux*|GNU*|Onyx*) LINKFORSHARED="-Xlinker -export-dynamic";;
++ 	# -u libsys_s pulls in all symbols in libsys
++ 	Darwin/*|iOS/*)
++ 		LINKFORSHARED="$extra_undefs -framework CoreFoundation"
+diff --git a/fixup.patch b/fixup.patch
+new file mode 100644
+index 0000000..3d700ef
+--- /dev/null
++++ b/fixup.patch
+@@ -0,0 +1,13 @@
++Index: Python-3.13.1/configure.ac
++===================================================================
++--- Python-3.13.1.orig/configure.ac
+++++ Python-3.13.1/configure.ac
++@@ -1561,7 +1561,7 @@ if test $enable_shared = "yes"; then
++         PY3LIBRARY=libpython3.so
++       fi
++       ;;
++-    Linux*|GNU*|NetBSD*|FreeBSD*|DragonFly*|OpenBSD*|VxWorks*)
+++    Linux*|GNU*|NetBSD*|FreeBSD*|DragonFly*|OpenBSD*|VxWorks*|Onyx*)
++       LDLIBRARY='libpython$(LDVERSION).so'
++       BLDLIBRARY='-L. -lpython$(LDVERSION)'
++       RUNSHARED=LD_LIBRARY_PATH=`pwd`${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+diff --git a/onyx-support.patch b/onyx-support.patch
+new file mode 100644
+index 0000000..d9262e2
+--- /dev/null
++++ b/onyx-support.patch
+@@ -0,0 +1,22 @@
++Index: Python-3.13.1/configure.ac
++===================================================================
++--- Python-3.13.1.orig/configure.ac
+++++ Python-3.13.1/configure.ac
++@@ -339,6 +339,9 @@ then
++ 	*-*-wasi*)
++ 	    ac_sys_system=WASI
++ 	    ;;
+++	*-*-onyx*)
+++	    ac_sys_system=Onyx
+++	    ;;
++ 	*)
++ 		# for now, limit cross builds to known configurations
++ 		MACHDEP="unknown"
++@@ -366,6 +369,7 @@ then
++ 	linux*) MACHDEP="linux";;
++ 	cygwin*) MACHDEP="cygwin";;
++ 	darwin*) MACHDEP="darwin";;
+++	onyx*) MACHDEP="onyx";;
++ 	'')	MACHDEP="unknown";;
++     esac
++ 
+diff --git a/platform-triplet-fix.patch b/platform-triplet-fix.patch
+new file mode 100644
+index 0000000..76ec2ab
+--- /dev/null
++++ b/platform-triplet-fix.patch
+@@ -0,0 +1,20 @@
++Index: Python-3.13.1/Misc/platform_triplet.c
++===================================================================
++--- Python-3.13.1.orig/Misc/platform_triplet.c
+++++ Python-3.13.1/Misc/platform_triplet.c
++@@ -12,6 +12,7 @@
++ #undef powerpc
++ #undef sparc
++ #undef unix
+++#undef onyx
++ 
++ #if defined(__ANDROID__)
++ #  if defined(__x86_64__)
++@@ -41,6 +42,7 @@ PLATFORM_TRIPLET=riscv64-onyx
++ #endif
++ #else
++ #error "unknown architecture"
+++#endif
++ #elif defined(__linux__)
++ /*
++  * BEGIN of Linux block
+diff --git a/platform-triplet.patch b/platform-triplet.patch
+new file mode 100644
+index 0000000..870d141
+--- /dev/null
++++ b/platform-triplet.patch
+@@ -0,0 +1,26 @@
++Index: Python-3.13.1/Misc/platform_triplet.c
++===================================================================
++--- Python-3.13.1.orig/Misc/platform_triplet.c
+++++ Python-3.13.1/Misc/platform_triplet.c
++@@ -26,6 +26,21 @@ PLATFORM_TRIPLET=arm-linux-androideabi
++ #    error unknown Android platform
++ #  endif
++ 
+++#elif defined(__onyx__)
+++#ifdef __x86_64__
+++PLATFORM_TRIPLET=x86_64-onyx
+++#elif defined(__aarch64)
+++PLATFORM_TRIPLET=aarch64-onyx
+++#elif defined(__riscv__)
+++#if __riscv_xlen == 32
+++PLATFORM_TRIPLET=riscv32-onyx
+++#elif __riscv_xlen == 64
+++PLATFORM_TRIPLET=riscv64-onyx
+++#else
+++#error "bad riscv xlen"
+++#endif
+++#else
+++#error "unknown architecture"
++ #elif defined(__linux__)
++ /*
++  * BEGIN of Linux block
+diff --git a/python3.13.spec b/python3.13.spec
+index aade60b..6eb9a31 100644
+--- a/python3.13.spec
++++ b/python3.13.spec
+@@ -51,7 +51,7 @@ License: Python-2.0.1
+ 
+ # Whether to use RPM build wheels from the python-{pip,setuptools,wheel}-wheel packages
+ # Uses upstream bundled prebuilt wheels otherwise
+-%bcond rpmwheels 1
++%bcond rpmwheels 0
+ # If the rpmwheels condition is disabled, we use the bundled wheel packages
+ # from Python with the versions below.
+ # This needs to be manually updated when we update Python.
+@@ -108,18 +108,18 @@ Provides: bundled(python3dist(packaging)) = 24
+ }
+ 
+ # Expensive optimizations (mainly, profile-guided optimizations)
+-%bcond optimizations 1
++%bcond optimizations 0
+ 
+ # Run the test suite in %%check
+-%bcond tests 1
++%bcond tests 0
+ 
+ # Extra build for debugging the interpreter or C-API extensions
+ # (the -debug subpackages)
+-%bcond debug_build 1
++%bcond debug_build 0
+ 
+ # Extra build without GIL, the freethreading PEP 703 provisional way
+ # (the -freethreading subpackage)
+-%bcond freethreading_build 1
++%bcond freethreading_build 0
+ 
+ # PEP 744: JIT Compilation
+ # Whether to build with the experimental JIT compiler
+@@ -166,10 +166,7 @@ Provides: bundled(python3dist(packaging)) = 24
+ %global dynload_dir_freethreading %{pylibdir_freethreading}/lib-dynload
+ 
+ # We use the upstream arch triplets, we convert them from %%{_arch}-linux%%{_gnu}
+-%global platform_triplet %{expand:%(echo %{_arch}-linux%{_gnu} | sed -E \\
+-    -e 's/^arm(eb)?-linux-gnueabi$/arm\\1-linux-gnueabihf/' \\
+-    -e 's/^mips64(el)?-linux-gnu$/mips64\\1-linux-gnuabi64/' \\
+-    -e 's/^ppc(64)?(le)?-linux-gnu$/powerpc\\1\\2-linux-gnu/')}
++%global platform_triplet %{_arch}-onyx
+ 
+ %global SOABI_optimized           cpython-%{pyshortver}%{ABIFLAGS_optimized}-%{platform_triplet}
+ %global SOABI_debug               cpython-%{pyshortver}%{ABIFLAGS_debug}-%{platform_triplet}
+@@ -241,38 +238,39 @@ Obsoletes: python%{pybasever}%{?1:-%{1}}\
+ 
+ # (keep this list alphabetized within the %%if blocks)
+ 
++# TODO: PACKAGING: bz2, libffi, libuuid, ncurses, pkgconfig, readline, zstd, zstd
+ BuildRequires: autoconf
+-BuildRequires: bluez-libs-devel
+-BuildRequires: bzip2-devel
++#BuildRequires: bluez-libs-devel
++#BuildRequires: bzip2-devel
+ # See the runtime requirement in the -libs subpackage
+-BuildRequires: expat-devel >= 2.6
++BuildRequires: expat >= 2.6
+ BuildRequires: findutils
+ BuildRequires: gcc
+-BuildRequires: gdbm-devel
+-BuildRequires: git-core
+-BuildRequires: glibc-devel
+-BuildRequires: gnupg2
+-BuildRequires: libX11-devel
+-BuildRequires: libffi-devel
+-BuildRequires: libuuid-devel
++#BuildRequires: gdbm-devel
++#BuildRequires: git-core
++#BuildRequires: glibc-devel
++#BuildRequires: gnupg2
++#BuildRequires: libX11-devel
++#BuildRequires: libffi-devel
++#BuildRequires: libuuid-devel
+ BuildRequires: make
+-BuildRequires: mpdecimal-devel
+-BuildRequires: ncurses-devel
++#BuildRequires: mpdecimal-devel
++#BuildRequires: ncurses-devel
+ BuildRequires: openssl-devel
+-BuildRequires: pkgconfig
++#BuildRequires: pkgconfig
+ BuildRequires: python-rpm-macros
+-BuildRequires: readline-devel
+-BuildRequires: redhat-rpm-config >= 127
++#BuildRequires: readline-devel
++BuildRequires: onyx-rpm-config >= 127
+ BuildRequires: sqlite-devel
+-BuildRequires: systemtap-sdt-devel
++#BuildRequires: systemtap-sdt-devel
+ BuildRequires: tcl-devel
+-BuildRequires: tk-devel
++#BuildRequires: tk-devel
+ BuildRequires: xz-devel
+ BuildRequires: zlib-devel
+-BuildRequires: /usr/bin/dtrace
++#BuildRequires: /usr/bin/dtrace
+ 
+ %if %{undefined rhel}
+-BuildRequires: libb2-devel
++#BuildRequires: libb2-devel
+ %endif
+ 
+ %if %{with tests}
+@@ -288,12 +286,12 @@ BuildRequires: llvm(major) = 18
+ %endif
+ 
+ %ifarch %{valgrind_arches}
+-BuildRequires: valgrind-devel
++#BuildRequires: valgrind-devel
+ %endif
+ 
+ %if %{with main_python}
+-BuildRequires: desktop-file-utils
+-BuildRequires: libappstream-glib
++#BuildRequires: desktop-file-utils
++#BuildRequires: libappstream-glib
+ %endif
+ 
+ %if %{with rpmwheels}
+@@ -333,12 +331,15 @@ Source2: https://github.com/Yhg1s.gpg
+ # Originally written by bkabrda
+ Source8: check-pyc-timestamps.py
+ 
++%if 0
+ # Desktop menu entry for idle3
+ Source10: idle3.desktop
+ 
+ # AppData file for idle3
+ Source11: idle3.appdata.xml
+ 
++%endif
++
+ # (Patches taken from github.com/fedora-python/cpython)
+ 
+ # 00251 # 5ac6e7781923cbb3e4606e3bca381a1167d322e5
+@@ -379,6 +380,11 @@ Patch445: 00445-cve-2024-12254-ensure-_selectorsockettransport-writelines-pauses
+ #
+ #     https://github.com/fedora-python/cpython
+ 
++Patch1: onyx-support.patch
++Patch2: bldshared.patch
++Patch3: fixup.patch
++Patch4: platform-triplet.patch
++Patch5: platform-triplet-fix.patch
+ 
+ # ==========================================
+ # Descriptions, and metadata for subpackages
+@@ -757,8 +763,13 @@ extension modules.
+ # ======================================================
+ 
+ %prep
+-%gpgverify -k2 -s1 -d0
+-%autosetup -S git_am -n Python-%{upstream_version}
++%autosetup -S git_am -N -n Python-%{upstream_version}
++%autopatch -m 10
++%patch -p1 1
++%patch -p1 2
++%patch -p1 3
++%patch -p1 4
++%patch -p1 5
+ 
+ # Verify the second level of bundled provides is up to date
+ # Arguably this should be done in %%check, but %%prep has a faster feedback loop
+@@ -781,7 +792,6 @@ find -name '*.exe' -print -delete
+ 
+ # Remove bundled libraries to ensure that we're using the system copy.
+ rm -r Modules/expat
+-rm -r Modules/_decimal/libmpdec
+ 
+ # Remove files that should be generated by the build
+ # (This is after patching, so that we can use patches directly from upstream)
+@@ -868,17 +878,16 @@ BuildPython() {
+   --with-dbmliborder=gdbm:ndbm:bdb \
+   --with-system-expat \
+   --with-system-ffi \
+-  --with-system-libmpdec \
+   --enable-loadable-sqlite-extensions \
+-  --with-dtrace \
+-  --with-lto \
+   --with-ssl-default-suites=openssl \
+   --without-static-libpython \
+ %if %{with rpmwheels}
+   --with-wheel-pkg-dir=%{python_wheel_dir} \
+ %endif
++%if 0
+ %ifarch %{valgrind_arches}
+   --with-valgrind \
++%endif
+ %endif
+   $ExtraConfigArgs \
+   %{nil}
+@@ -1064,6 +1073,7 @@ install -d -m 0755 %{buildroot}%{_prefix}/lib/python%{pybasever}%{ABIFLAGS_freet
+ %endif # with freethreading_build
+ %endif
+ 
++%if 0
+ %if %{with main_python}
+ # add idle3 to menu
+ install -D -m 0644 Lib/idlelib/Icons/idle_16.png %{buildroot}%{_datadir}/icons/hicolor/16x16/apps/idle3.png
+@@ -1077,6 +1087,7 @@ mkdir -p %{buildroot}%{_metainfodir}
+ cp -a %{SOURCE11} %{buildroot}%{_metainfodir}
+ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/idle3.appdata.xml
+ %endif
++%endif
+ 
+ # Make sure sysconfig looks at the right pyconfig-32.h/pyconfig-64.h file instead of pyconfig.h
+ # See https://bugzilla.redhat.com/show_bug.cgi?id=201434
+@@ -1342,7 +1353,7 @@ CheckPython freethreading
+ %{1}/concurrent/\
+ %{1}/ctypes/\
+ %{1}/curses/\
+-%{1}/dbm/\
++%{1}/dbm \
+ %{1}/encodings/\
+ %{1}/html/\
+ %{1}/http/\
+@@ -1391,8 +1402,8 @@ CheckPython freethreading
+ 
+ # This will be in the debug package
+ %if %{with debug_build}
+-%exclude %{pylibdir}/_sysconfigdata_%{ABIFLAGS_debug}_linux_%{platform_triplet}.py
+-%exclude %{pylibdir}/__pycache__/_sysconfigdata_%{ABIFLAGS_debug}_linux_%{platform_triplet}%{bytecode_suffixes}
++%exclude %{pylibdir}/_sysconfigdata_%{ABIFLAGS_debug}_onyx_%{platform_triplet}.py
++%exclude %{pylibdir}/__pycache__/_sysconfigdata_%{ABIFLAGS_debug}_onyx_%{platform_triplet}%{bytecode_suffixes}
+ %endif
+ 
+ # Extension modules
+@@ -1414,8 +1425,6 @@ CheckPython freethreading
+ %{1}/_curses.%{2}.so\
+ %{1}/_curses_panel.%{2}.so\
+ %{1}/_datetime.%{2}.so\
+-%{1}/_dbm.%{2}.so\
+-%{1}/_gdbm.%{2}.so\
+ %{1}/_decimal.%{2}.so\
+ %{1}/_elementtree.%{2}.so\
+ %{1}/_hashlib.%{2}.so\
+@@ -1453,7 +1462,6 @@ CheckPython freethreading
+ %{1}/math.%{2}.so\
+ %{1}/mmap.%{2}.so\
+ %{1}/pyexpat.%{2}.so\
+-%{1}/readline.%{2}.so\
+ %{1}/resource.%{2}.so\
+ %{1}/select.%{2}.so\
+ %{1}/syslog.%{2}.so\
+@@ -1496,7 +1504,7 @@ CheckPython freethreading
+ %{_includedir}/python%{LDVERSION_optimized}/internal/
+ %{_includedir}/python%{LDVERSION_optimized}/cpython/
+ %doc Misc/README.valgrind Misc/valgrind-python.supp
+-
++%{_usr}/lib/debug/%{_libdir}/*
+ %if %{with main_python}
+ %{_bindir}/python3-config
+ %{_bindir}/python-config
+@@ -1512,6 +1520,7 @@ CheckPython freethreading
+ %{_bindir}/pygettext%{pybasever}.py
+ %{_bindir}/msgfmt%{pybasever}.py
+ 
++
+ %{_bindir}/python%{pybasever}-config
+ %{_bindir}/python%{LDVERSION_optimized}-config
+ %{_bindir}/python%{LDVERSION_optimized}-*-config
+@@ -1532,14 +1541,15 @@ CheckPython freethreading
+ %{pylibdir}/idlelib
+ 
+ %if %{with main_python}
+-%{_metainfodir}/idle3.appdata.xml
+-%{_datadir}/applications/idle3.desktop
+-%{_datadir}/icons/hicolor/*/apps/idle3.*
++#%{_metainfodir}/idle3.appdata.xml
++#%{_datadir}/applications/idle3.desktop
++#%{_datadir}/icons/hicolor/*/apps/idle3.*
+ %endif
+ 
+ %files -n %{pkgname}-tkinter
+ %{pylibdir}/tkinter
+-%{dynload_dir}/_tkinter.%{SOABI_optimized}.so
++# This does not exist. Probably because we dont have tkinter deps.
++#%{dynload_dir}/_tkinter.%{SOABI_optimized}.so
+ %{pylibdir}/turtle.py
+ %{pylibdir}/__pycache__/turtle*%{bytecode_suffixes}
+ %dir %{pylibdir}/turtledemo
+@@ -1609,8 +1619,8 @@ CheckPython freethreading
+ %{_libdir}/pkgconfig/python-%{LDVERSION_debug}.pc
+ %{_libdir}/pkgconfig/python-%{LDVERSION_debug}-embed.pc
+ 
+-%{pylibdir}/_sysconfigdata_%{ABIFLAGS_debug}_linux_%{platform_triplet}.py
+-%{pylibdir}/__pycache__/_sysconfigdata_%{ABIFLAGS_debug}_linux_%{platform_triplet}%{bytecode_suffixes}
++%{pylibdir}/_sysconfigdata_%{ABIFLAGS_debug}_onyx_%{platform_triplet}.py
++%{pylibdir}/__pycache__/_sysconfigdata_%{ABIFLAGS_debug}_onyx_%{platform_triplet}%{bytecode_suffixes}
+ 
+ %endif # with debug_build
+ 
+@@ -1634,8 +1644,8 @@ CheckPython freethreading
+ 
+ # This will be in the -freethreading-debug package
+ %if %{with debug_build}
+-%exclude %{pylibdir_freethreading}/_sysconfigdata_%{ABIFLAGS_freethreading_debug}_linux_%{platform_triplet}.py
+-%exclude %{pylibdir_freethreading}/__pycache__/_sysconfigdata_%{ABIFLAGS_freethreading_debug}_linux_%{platform_triplet}%{bytecode_suffixes}
++%exclude %{pylibdir_freethreading}/_sysconfigdata_%{ABIFLAGS_freethreading_debug}_onyx_%{platform_triplet}.py
++%exclude %{pylibdir_freethreading}/__pycache__/_sysconfigdata_%{ABIFLAGS_freethreading_debug}_onyx_%{platform_triplet}%{bytecode_suffixes}
+ %endif
+ 
+ # Analog of the core subpackage's files:
+@@ -1681,8 +1691,8 @@ CheckPython freethreading
+ %{_libdir}/pkgconfig/python-%{LDVERSION_freethreading_debug}.pc
+ %{_libdir}/pkgconfig/python-%{LDVERSION_freethreading_debug}-embed.pc
+ 
+-%{pylibdir_freethreading}/_sysconfigdata_%{ABIFLAGS_freethreading_debug}_linux_%{platform_triplet}.py
+-%{pylibdir_freethreading}/__pycache__/_sysconfigdata_%{ABIFLAGS_freethreading_debug}_linux_%{platform_triplet}%{bytecode_suffixes}
++%{pylibdir_freethreading}/_sysconfigdata_%{ABIFLAGS_freethreading_debug}_onyx_%{platform_triplet}.py
++%{pylibdir_freethreading}/__pycache__/_sysconfigdata_%{ABIFLAGS_freethreading_debug}_onyx_%{platform_triplet}%{bytecode_suffixes}
+ 
+ %endif # with freethreading_build && debug_build
+ 
+
+base-commit: 00aa424d30ed176d7fc8c7399e0037a6a6e70c34
+-- 
+2.46.2
+
