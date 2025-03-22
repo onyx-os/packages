@@ -1,0 +1,2 @@
+origin: https://src.fedoraproject.org/rpms/libarchive.git
+base-commit: 770956a24d716ff507addbad28c29cd3cfae71b2

@@ -1,0 +1,88 @@
+From 817a85e96e8f446ef3c834aeb310a387f53f726d Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 19:43:19 +0000
+Subject: [PATCH] Onyx specific hacks
+
+Remove some dependencies, workaround a few problems, install bsdtar as
+tar.
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ libarchive.spec | 24 +++++++++++++-----------
+ 1 file changed, 13 insertions(+), 11 deletions(-)
+
+diff --git a/libarchive.spec b/libarchive.spec
+index 853f69b..4dd4ad5 100644
+--- a/libarchive.spec
++++ b/libarchive.spec
+@@ -19,10 +19,10 @@ BuildRequires:  autoconf
+ BuildRequires:  automake
+ BuildRequires:  bison
+ BuildRequires:  bzip2-devel
+-BuildRequires:  e2fsprogs-devel
++#BuildRequires:  e2fsprogs-devel
+ BuildRequires:  gcc
+-BuildRequires:  libacl-devel
+-BuildRequires:  libattr-devel
++#BuildRequires:  libacl-devel
++#BuildRequires:  libattr-devel
+ BuildRequires:  libtool
+ BuildRequires:  libxml2-devel
+ BuildRequires:  libzstd-devel
+@@ -30,9 +30,9 @@ BuildRequires:  lz4-devel
+ # According to libarchive maintainer, linking against liblzo violates
+ # LZO license.
+ # See https://github.com/libarchive/libarchive/releases/tag/v3.3.0
+-#BuildRequires:  lzo-devel
++BuildRequires:  lzo-devel
+ BuildRequires:  openssl-devel
+-BuildRequires:  sharutils
++#BuildRequires:  sharutils
+ BuildRequires:  xz-devel
+ BuildRequires:  zlib-devel
+ BuildRequires: make
+@@ -108,7 +108,7 @@ autoreconf -ifv
+ 
+ %install
+ %make_install
+-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
++ln -s bsdtar $RPM_BUILD_ROOT/%{_bindir}/tar
+ 
+ # rhbz#1294252
+ replace ()
+@@ -118,6 +118,7 @@ replace ()
+     binary=${file%%.*}
+     pattern=${binary##bsd}
+ 
++    # This fails locally with "bad substitution". Weird.
+     awk "
+         # replace the topic
+         /^.Dt ${pattern^^} 1/ {
+@@ -136,11 +137,11 @@ replace ()
+     mv "$filename".new "$filename"
+ }
+ 
+-for manpage in bsdtar.1 bsdcpio.1
+-do
+-    installed_manpage=`find "$RPM_BUILD_ROOT" -name "$manpage"`
+-    replace "$installed_manpage"
+-done
++#for manpage in bsdtar.1 bsdcpio.1
++#do
++#    installed_manpage=`find "$RPM_BUILD_ROOT" -name "$manpage"`
++#    replace "$installed_manpage"
++#done
+ 
+ 
+ %check
+@@ -216,6 +217,7 @@ run_testsuite
+ %license COPYING
+ %doc NEWS README.md
+ %{_bindir}/bsdtar
++%{_bindir}/tar
+ %{_mandir}/*/bsdtar*
+ 
+ %files -n bsdcpio
+-- 
+2.46.2
+
