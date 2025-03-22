@@ -1,4 +1,6 @@
 #!/bin/sh
+# SPDX-License-Identifer: GPL-2.0-only
+# # Copyright (c) Pedro Falcato
 set -e
 mkdir -p tmp/
 
