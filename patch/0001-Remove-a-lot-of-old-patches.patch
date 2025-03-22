@@ -1,0 +1,148 @@
+From 57c38c57647d52a3385c872f1bc4ad5a1a8af628 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:08:52 +0000
+Subject: [PATCH] Remove a lot of old patches
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ patch.spec | 105 +++++++++++++++++++++++++++--------------------------
+ 1 file changed, 53 insertions(+), 52 deletions(-)
+
+diff --git a/patch.spec b/patch.spec
+index 9ae5601..89f71f7 100644
+--- a/patch.spec
++++ b/patch.spec
+@@ -7,32 +7,32 @@ Release: 25%{?dist}
+ License: GPL-3.0-or-later
+ URL: https://savannah.gnu.org/projects/patch/
+ Source: https://ftp.gnu.org/gnu/patch/patch-%{version}.tar.xz
+-Patch0: patch-2.7.6-avoid-set_file_attributes-sign-conversion-warnings.patch
+-patch1: patch-2.7.6-test-suite-compatibility-fixes.patch
+-Patch2: patch-2.7.6-fix-korn-shell-incompatibility.patch
+-Patch3: patch-2.7.6-fix-segfault-with-mangled-rename-patch.patch
+-Patch4: patch-2.7.6-allow-input-files-to-be-missing-for-ed-style-patches.patch
+-Patch5: patch-CVE-2018-1000156.patch
+-Patch6: patch-2.7.6-CVE-2019-13638-invoked-ed-directly-instead-of-using-the-shell.patch
+-Patch7: patch-2.7.6-switch-from-fork-execlp-to-execute.patch
+-Patch8: patch-2.7.6-cleanups-in-do_ed_script.patch
+-Patch9: patch-2.7.6-avoid-warnings-gcc8.patch
+-Patch10: patch-2.7.6-check-of-return-value-of-fwrite.patch
+-Patch11: patch-2.7.6-fix-ed-style-test-failure.patch
+-Patch12: patch-2.7.6-dont-leak-temporary-file-on-failed-ed-style-patch.patch
+-Patch13: patch-2.7.6-dont-leak-temporary-file-on-failed-multi-file-ed-style-patch.patch
+-Patch14: patch-2.7.6-make-debug-output-more-useful.patch
+-Patch15: patch-2.7.6-CVE-2018-6952-fix-swapping-fake-lines-in-pch_swap.patch
+-Patch16: patch-2.7.6-improve_support_for_memory_leak_detection.patch
+-patch17: patch-2.7.6-skip-ed-test-when-the-ed-utility-is-not-installed.patch
+-Patch18: patch-2.7.6-abort_when_cleaning_up_fails.patch
+-Patch19: patch-2.7.6-crash-RLIMIT_NOFILE.patch
+-Patch20: patch-2.7.6-CVE-2019-13636-symlinks.patch
+-Patch21: patch-2.7.6-avoid-invalid-memory-access-in-context-format-diffs.patch
+-Patch22: patch-2.7.6-CVE-2018-17942.patch
+-Patch23: patch-2.7.6-failed_assertion.patch
+-Patch100: patch-selinux.patch
+-Patch101: patch-configure-c99.patch
++#Patch0: patch-2.7.6-avoid-set_file_attributes-sign-conversion-warnings.patch
++#patch1: patch-2.7.6-test-suite-compatibility-fixes.patch
++#Patch2: patch-2.7.6-fix-korn-shell-incompatibility.patch
++#Patch3: patch-2.7.6-fix-segfault-with-mangled-rename-patch.patch
++#Patch4: patch-2.7.6-allow-input-files-to-be-missing-for-ed-style-patches.patch
++#Patch5: patch-CVE-2018-1000156.patch
++#Patch6: patch-2.7.6-CVE-2019-13638-invoked-ed-directly-instead-of-using-the-shell.patch
++#Patch7: patch-2.7.6-switch-from-fork-execlp-to-execute.patch
++#Patch8: patch-2.7.6-cleanups-in-do_ed_script.patch
++#Patch9: patch-2.7.6-avoid-warnings-gcc8.patch
++#Patch10: patch-2.7.6-check-of-return-value-of-fwrite.patch
++##Patch11: patch-2.7.6-fix-ed-style-test-failure.patch
++#Patch12: patch-2.7.6-dont-leak-temporary-file-on-failed-ed-style-patch.patch
++#Patch13: patch-2.7.6-dont-leak-temporary-file-on-failed-multi-file-ed-style-patch.patch
++#Patch14: patch-2.7.6-make-debug-output-more-useful.patch
++#Patch15: patch-2.7.6-CVE-2018-6952-fix-swapping-fake-lines-in-pch_swap.patch
++#Patch16: patch-2.7.6-improve_support_for_memory_leak_detection.patch
++#patch17: patch-2.7.6-skip-ed-test-when-the-ed-utility-is-not-installed.patch
++#Patch18: patch-2.7.6-abort_when_cleaning_up_fails.patch
++#Patch19: patch-2.7.6-crash-RLIMIT_NOFILE.patch
++#Patch20: patch-2.7.6-CVE-2019-13636-symlinks.patch
++#Patch21: patch-2.7.6-avoid-invalid-memory-access-in-context-format-diffs.patch
++#Patch22: patch-2.7.6-CVE-2018-17942.patch
++#Patch23: patch-2.7.6-failed_assertion.patch
++#Patch100: patch-selinux.patch
++#Patch101: patch-configure-c99.patch
+ 
+ BuildRequires: make
+ BuildRequires: gcc
+@@ -57,35 +57,35 @@ applications.
+ 
+ %prep
+ %setup -q
+-%patch 0 -p1 -b .avoid-set_file_attributes-sign-conversion-warnings
+-%patch 1 -p1 -b .test-suite-compatibility-fixes
+-%patch 2 -p1 -b .fix-korn-shell-incompatibility
+-%patch 3 -p1 -b .fix-segfault-with-mangled-rename-patch
+-%patch 4 -p1 -b .allow-input-files-to-be-missing-for-ed-style-patches
++#%patch 0 -p1 -b .avoid-set_file_attributes-sign-conversion-warnings
++#%patch 1 -p1 -b .test-suite-compatibility-fixes
++#%patch 2 -p1 -b .fix-korn-shell-incompatibility
++#%patch 3 -p1 -b .fix-segfault-with-mangled-rename-patch
++#%patch 4 -p1 -b .allow-input-files-to-be-missing-for-ed-style-patches
+ # CVE-2018-1000156, Malicious patch files cause ed to execute arbitrary commands
+-%patch 5 -p1 -b .CVE-2018-1000156
+-%patch 6 -p1 -b .CVE-2019-13638-invoked-ed-directly-instead-of-using-the-shell
+-%patch 7 -p1 -b .switch-from-fork-execlp-to-execute
+-%patch 8 -p1 -b .cleanups-in-do_ed_script
+-%patch 9 -p1 -b .avoid-warnings-gcc8
+-%patch 10 -p1 -b .check-of-return-value-of-fwrite
+-%patch 11 -p1 -b .fix-ed-style-test-failure
+-%patch 12 -p1 -b .dont-leak-temporary-file-on-failed-ed-style-patch
+-%patch 13 -p1 -b .dont-leak-temporary-file-on-failed-multi-file-ed-style-patch
+-%patch 14 -p1 -b .make-debug-output-more-useful
+-%patch 15 -p1 -b .CVE-2018-6952-fix-swapping-fake-lines-in-pch_swap
+-%patch 16 -p1 -b .improve_support_for_memory_leak_detection
+-%patch 17 -p1 -b .skip-ed-test-when-the-ed-utility-is-not-installed
+-%patch 18 -p1 -b .abort_when_cleaning_up_fails
+-%patch 19 -p1 -b .crash-RLIMIT_NOFILE
+-%patch 20 -p1 -b .CVE-2019-13636-symlinks
+-%patch 21 -p1 -b .avoid-invalid-memory-access-in-context-format-diffs
++#%patch 5 -p1 -b .CVE-2018-1000156
++#%patch 6 -p1 -b .CVE-2019-13638-invoked-ed-directly-instead-of-using-the-shell
++#%patch 7 -p1 -b .switch-from-fork-execlp-to-execute
++#%patch 8 -p1 -b .cleanups-in-do_ed_script
++#%patch 9 -p1 -b .avoid-warnings-gcc8
++#%patch 10 -p1 -b .check-of-return-value-of-fwrite
++#%patch 11 -p1 -b .fix-ed-style-test-failure
++#%patch 12 -p1 -b .dont-leak-temporary-file-on-failed-ed-style-patch
++#%patch 13 -p1 -b .dont-leak-temporary-file-on-failed-multi-file-ed-style-patch
++#%patch 14 -p1 -b .make-debug-output-more-useful
++#%patch 15 -p1 -b .CVE-2018-6952-fix-swapping-fake-lines-in-pch_swap
++#%patch 16 -p1 -b .improve_support_for_memory_leak_detection
++#%patch 17 -p1 -b .skip-ed-test-when-the-ed-utility-is-not-installed
++#%patch 18 -p1 -b .abort_when_cleaning_up_fails
++#%patch 19 -p1 -b .crash-RLIMIT_NOFILE
++#%patch 20 -p1 -b .CVE-2019-13636-symlinks
++#%patch 21 -p1 -b .avoid-invalid-memory-access-in-context-format-diffs
+ # CVE-2018-17942 gnulib: heap-based buffer overflow
+-%patch 22 -p1 -b .CVE-2018-17942-gnulib_buffer_overflow
+-%patch 23 -p1 -b .failed_assertion
++#%patch 22 -p1 -b .CVE-2018-17942-gnulib_buffer_overflow
++#%patch 23 -p1 -b .failed_assertion
+ # SELinux support.
+-%patch 100 -p1 -b .selinux
+-%patch 101 -p1
++#%patch 100 -p1 -b .selinux
++#%patch 101 -p1
+ 
+ %build
+ CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE"
+@@ -107,6 +107,7 @@ make check
+ %doc NEWS README
+ %{_bindir}/*
+ %{_mandir}/*/*
++%{_libdir}/charset.alias
+ 
+ %changelog
+ * Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 2.7.6-25
+
+base-commit: c77051f3bf0135c9fefe41672ad1a1ed98a3edff
+-- 
+2.46.2
+
