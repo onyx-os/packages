@@ -1,0 +1,61 @@
+From f9672fa5fbd4c5f2772b13efe6eb2bc13c6e7211 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 20:19:09 +0000
+Subject: [PATCH 2/2] Switch a bunch of defaults out
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ libsolv.spec | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/libsolv.spec b/libsolv.spec
+index 29696f1..5e13670 100644
+--- a/libsolv.spec
++++ b/libsolv.spec
+@@ -1,8 +1,8 @@
+ %global libname solv
+ 
+-%bcond_without python_bindings
+-%bcond_without perl_bindings
+-%bcond_without ruby_bindings
++%bcond_with python_bindings
++%bcond_with perl_bindings
++%bcond_with ruby_bindings
+ # Creates special prefixed pseudo-packages from appdata metadata
+ %bcond_without appdata
+ # Creates special prefixed "group:", "category:" pseudo-packages
+@@ -10,24 +10,24 @@
+ %bcond_without conda
+ # For rich dependencies
+ %bcond_without complex_deps
+-%bcond_without helix_repo
+-%bcond_without suse_repo
+-%bcond_without debian_repo
+-%bcond_without arch_repo
++%bcond_with helix_repo
++%bcond_with suse_repo
++%bcond_with debian_repo
++%bcond_with arch_repo
+ # For handling deb + rpm at the same time
+ %bcond_without multi_semantics
+ %if %{defined rhel}
+ %bcond_with zchunk
+ %else
+-%bcond_without zchunk
++%bcond_with zchunk
+ %endif
+-%bcond_without zstd
++%bcond_with zstd
+ 
+ %define __cmake_switch(b:) %[%{expand:%%{?with_%{-b*}}} ? "ON" : "OFF"]
+ 
+ Name:           lib%{libname}
+ Version:        0.7.30
+-Release:        %autorelease
++Release:        5%{?_dist}
+ Summary:        Package dependency solver
+ 
+ License:        BSD-3-Clause
+-- 
+2.46.2
+

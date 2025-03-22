@@ -1,0 +1,115 @@
+From 01ac63393d5b498d9d3a4ab3114d21a42423aa61 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Tue, 10 Dec 2024 00:30:18 +0000
+Subject: [PATCH 1/2] libsolv: First try at onyx libsolv
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ libsolv.spec | 45 ++++++++++++++++++---------------------------
+ 1 file changed, 18 insertions(+), 27 deletions(-)
+
+diff --git a/libsolv.spec b/libsolv.spec
+index 314524a..29696f1 100644
+--- a/libsolv.spec
++++ b/libsolv.spec
+@@ -34,17 +34,17 @@ License:        BSD-3-Clause
+ URL:            https://github.com/openSUSE/libsolv
+ Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+ 
+-BuildRequires:  cmake
+-BuildRequires:  gcc-c++
+-BuildRequires:  ninja-build
+-BuildRequires:  pkgconfig(rpm)
+-BuildRequires:  zlib-devel
++#BuildRequires:  cmake
++#BuildRequires:  gcc-c++
++#BuildRequires:  ninja-build
++#BuildRequires:  pkgconfig(rpm)
++#BuildRequires:  zlib-devel
+ # -DWITH_LIBXML2=ON
+ BuildRequires:  libxml2-devel
+ # -DENABLE_LZMA_COMPRESSION=ON
+-BuildRequires:  xz-devel
++#BuildRequires:  xz-devel
+ # -DENABLE_BZIP2_COMPRESSION=ON
+-BuildRequires:  bzip2-devel
++#BuildRequires:  bzip2-devel
+ %if %{with zstd}
+ # -DENABLE_ZSTD_COMPRESSION=ON
+ BuildRequires:  libzstd-devel
+@@ -141,13 +141,13 @@ Python 3 version.
+ %autosetup -p1
+ 
+ %build
+-%cmake -GNinja                                            \
+-  -DFEDORA=1                                              \
++# -D__GLIBC__ makes libsolv use the proper signature for qsort_r
++export CFLAGS="$CFLAGS -D__GLIBC__"
++cmake . -DCMAKE_INSTALL_PREFIX=/usr                        \
+   -DENABLE_RPMDB=ON                                       \
+   -DENABLE_RPMDB_BYRPMHEADER=ON                           \
+   -DENABLE_RPMDB_LIBRPM=ON                                \
+   -DENABLE_RPMPKG_LIBRPM=ON                               \
+-  -DENABLE_RPMMD=ON                                       \
+   -DENABLE_COMPS=%{__cmake_switch -b comps}               \
+   -DENABLE_APPDATA=%{__cmake_switch -b appdata}           \
+   -DUSE_VENDORDIRS=ON                                     \
+@@ -172,19 +172,12 @@ Python 3 version.
+ %if %{with python_bindings}
+   -DPYTHON_EXECUTABLE=%{python3}                          \
+ %endif
++  -DENABLE_LUA=FALSE -DENABLE_RPMMD=ON \
+   %{nil}
+-%cmake_build
++make -j4
+ 
+ %install
+-%cmake_install
+-
+-%check
+-%ctest
+-
+-# Python smoke test (not tested in %%ctest):
+-export PYTHONPATH=%{buildroot}%{python3_sitearch}
+-export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
+-%python3 -c 'import solv'
++%make_install
+ 
+ %files
+ %license LICENSE*
+@@ -213,15 +206,15 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
+ %solv_tool rpmdb2solv
+ 
+ %files tools
+-%solv_tool deltainfoxml2solv
+ %solv_tool dumpsolv
+ %solv_tool installcheck
+ %solv_tool mergesolv
+-%solv_tool repomdxml2solv
+-%solv_tool rpmmd2solv
+ %solv_tool rpms2solv
+-%solv_tool testsolv
++%solv_tool rpmmd2solv
++%solv_tool repomdxml2solv
+ %solv_tool updateinfoxml2solv
++%solv_tool deltainfoxml2solv
++%solv_tool testsolv
+ %if %{with comps}
+   %solv_tool comps2solv
+ %endif
+@@ -244,9 +237,7 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
+ %if %{with conda}
+   %{_bindir}/conda2solv
+ %endif
+-
+-%files demo
+-%solv_tool solv
++%{_mandir}/man1/solv.1*
+ 
+ %if %{with perl_bindings}
+ %files -n perl-%{libname}
+
+base-commit: 6d0269fa81ce037905de27d6c4df9e4ef2255732
+-- 
+2.46.2
+

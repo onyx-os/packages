@@ -1,0 +1,2 @@
+origin: https://src.fedoraproject.org/rpms/libsolv.git
+base-commit: 6d0269fa81ce037905de27d6c4df9e4ef2255732
