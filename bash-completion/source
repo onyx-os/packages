@@ -1,0 +1,2 @@
+origin: https://src.fedoraproject.org/rpms/bash-completion.git
+base-commit: cfb9c923d564d1840152228d0223641852aea301
