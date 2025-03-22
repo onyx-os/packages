@@ -1,0 +1,45 @@
+From 36db07784608b73cdad0e9e382500aaa60d408a1 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:45:22 +0000
+Subject: [PATCH] Onyx-specific build dep workarounds
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ xz.spec | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/xz.spec b/xz.spec
+index 4a13c80..e801ba1 100644
+--- a/xz.spec
++++ b/xz.spec
+@@ -30,12 +30,13 @@ Requires:	%{name}-libs%{?_isa} = %{epoch}:%{version}-%{release}
+ # For /usr/libexec/grepconf.sh (RHBZ#1189120).
+ # Unfortunately F21 has a newer version of grep which doesn't
+ # have grepconf, but we're only concerned with F22 here.
+-Requires:	grep >= 2.20-5
++#Requires:	grep >= 2.20-5
+ 
+ BuildRequires:	make
+ BuildRequires:	gcc
+-BuildRequires:	gnupg2
+-BuildRequires:	perl-interpreter
++#BuildRequires:	gnupg2
++BuildRequires: perl
++#BuildRequires:	perl-interpreter
+ BuildRequires:	autoconf automake libtool gettext-devel
+ 
+ 
+@@ -91,7 +92,7 @@ commands that deal with the older LZMA format.
+ 
+ 
+ %prep
+-%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
++#%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
+ %autosetup -p1
+ autoreconf -fi
+ 
+
+base-commit: 236e0d31de4c21c670e4cae908114f3261345609
+-- 
+2.46.2
+
