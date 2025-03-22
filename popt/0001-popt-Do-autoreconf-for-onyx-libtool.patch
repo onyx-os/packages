@@ -1,0 +1,27 @@
+From 1094fc2d02f8e9e633c13e0daa8489d35f0ecd40 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:15:47 +0000
+Subject: [PATCH] popt: Do autoreconf for onyx libtool
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ popt.spec | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/popt.spec b/popt.spec
+index 7cf04ce..cbcf5d8 100644
+--- a/popt.spec
++++ b/popt.spec
+@@ -54,6 +54,7 @@ Install it if you need to link statically with libpopt.
+ %autosetup -n %{name}-%{srcver} -p1
+ 
+ %build
++autoreconf -fi
+ %configure %{?_without_static:--disable-static}
+ %make_build
+ 
+
+base-commit: 8f145b5bc2aea81f4e60f6072624cb1d5fe91612
+-- 
+2.46.2
+
