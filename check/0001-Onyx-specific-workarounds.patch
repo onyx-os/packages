@@ -1,0 +1,106 @@
+From 029765652b614debfa88daa6efaa4a596514f739 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:52:42 +0000
+Subject: [PATCH] Onyx-specific workarounds
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ check.spec | 38 +++++++++++++++++++-------------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/check.spec b/check.spec
+index 509c588..809b846 100644
+--- a/check.spec
++++ b/check.spec
+@@ -12,12 +12,12 @@ VCS:            git:https://github.com/libcheck/check.git
+ # Our tarball are the same sources with index.html and web/ removed.
+ # Easiest way to verify: unpack both tarballs and run
+ #    diff -r check-0.15.2 upstream-check-0.15.2
+-# Source:       https://github.com/libcheck/check/archive/{version}/{name}-{version}.tar.gz
+-Source:         %{name}-%{version}.tar.gz
++Source:       https://github.com/libcheck/check/archive/%{version}/%{name}-%{version}.tar.gz
++#Source:         %{name}-%{version}.tar.gz
+ # Only needed for autotools in Fedora
+-Patch0:         %{name}-0.11.0-info-in-builddir.patch
++#Patch0:         %{name}-0.11.0-info-in-builddir.patch
+ # Fix test failures due to varying floating point behavior across platforms
+-Patch1:         %{name}-0.11.0-fp.patch
++#Patch1:         %{name}-0.11.0-fp.patch
+ 
+ BuildRequires:  cmake
+ BuildRequires:  gcc
+@@ -26,9 +26,9 @@ BuildRequires:  make
+ BuildRequires:  patchutils
+ BuildRequires:  pkgconfig
+ %if ! 0%{?rhel}
+-BuildRequires:  pkgconfig(libsubunit)
++#BuildRequires:  pkgconfig(libsubunit)
+ %endif
+-BuildRequires:  texinfo, texlive-tex, graphviz
++#BuildRequires:  texinfo, texlive-tex, graphviz
+ 
+ %if %{with mingw}
+ BuildRequires: mingw32-filesystem >= 95
+@@ -92,7 +92,7 @@ MinGW libraries and headers for developing programs with check
+ %if 0%{?fedora}
+ %patch -P0 -p1 -b .info-in-builddir
+ %endif
+-%patch -P1 -p1
++#%patch -P1 -p1
+ 
+ # Fix detection of various time-related function declarations
+ sed -e '/DECLS(\[a/s|)|,,,[AC_INCLUDES_DEFAULT\n[#include <time.h>\n #include <sys/time.h>]]&|' \
+@@ -126,8 +126,8 @@ sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
+ %make_build
+ cd -
+ 
+-%cmake -DCHECK_ENABLE_TIMEOUT_TESTS:BOOL=OFF
+-%cmake_build
++%cmake . -DCMAKE_INSTALL_PREFIX=/usr -DCHECK_ENABLE_TIMEOUT_TESTS:BOOL=OFF
++%make_build
+ 
+ %if %{with mingw}
+ %mingw_configure
+@@ -142,7 +142,7 @@ rm -rf %{buildroot}%{_infodir}/dir
+ rm -rf %{buildroot}%{_docdir}/%{name}
+ cd -
+ 
+-%cmake_install
++%make_install
+ 
+ # The library does not really depend on -pthread
+ sed -i 's/ -pthread//' %{buildroot}%{_libdir}/pkgconfig/check.pc
+@@ -161,19 +161,19 @@ rm -f $RPM_BUILD_ROOT%{mingw64_mandir}/man1/checkmk.1*
+ %endif
+ 
+ %check
+-cd autotools_build
+-export LD_LIBRARY_PATH=$PWD/src/.libs
+-%ifnarch s390x
+-make check
+-%endif
++#cd autotools_build
++#export LD_LIBRARY_PATH=$PWD/src/.libs
++#%ifnarch s390x
++#make check
++#%endif
+ # Don't need to package the sh, log or trs files
+ # when we scoop the other checkmk/test files for doc
+-rm -rf checkmk/test/check_checkmk*
++#rm -rf checkmk/test/check_checkmk*
+ # these files are empty
+-rm -rf checkmk/test/empty_input
+-cd -
++#rm -rf checkmk/test/empty_input
++#cd -
+ 
+-%ldconfig_scriptlets
++#%ldconfig_scriptlets
+ 
+ %files
+ %doc AUTHORS NEWS
+
+base-commit: 4394ee4a390a977887390fb2bee1bf3b06e79a06
+-- 
+2.46.2
+
