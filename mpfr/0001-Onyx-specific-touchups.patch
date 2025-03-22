@@ -1,0 +1,60 @@
+From c71aa57e4ee15acc57613efa8b45f8a4af87836e Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 20:42:00 +0000
+Subject: [PATCH] Onyx specific touchups
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ mpfr.spec | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/mpfr.spec b/mpfr.spec
+index 4ab4009..adc09a2 100644
+--- a/mpfr.spec
++++ b/mpfr.spec
+@@ -1,7 +1,7 @@
+ Summary: C library for multiple-precision floating-point computations
+ Name: mpfr
+ Version: 4.2.1
+-Release: 5%{?dist}
++Release: 1%{?dist}
+ URL: https://www.mpfr.org/
+ VCS: git:https://gitlab.inria.fr/mpfr/mpfr.git
+ 
+@@ -10,6 +10,7 @@ BuildRequires: gcc
+ BuildRequires: gmp-devel
+ BuildRequires: make
+ BuildRequires: texinfo
++BuildRequires: autoconf, automake, libtool
+ 
+ Source: https://www.mpfr.org/%{name}-%{version}/%{name}-%{version}.tar.xz
+ 
+@@ -48,6 +49,7 @@ Documentation for the MPFR library.
+ %autosetup -p1
+ 
+ %build
++autoreconf -fi
+ %configure --disable-assert --disable-static
+ 
+ # Get rid of undesirable hardcoded rpaths; workaround libtool reordering
+@@ -62,7 +64,6 @@ sed -e 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' \
+ %install
+ %make_install
+ cp -p ChangeLog PATCHES README %{buildroot}%{_pkgdocdir}
+-rm -f %{buildroot}%{_libdir}/*.la
+ rm -f %{buildroot}%{_infodir}/dir
+ 
+ #these go into licenses, not doc
+@@ -77,6 +78,7 @@ export LD_LIBRARY_PATH=%{buildroot}%{_libdir}
+ %dir %{_pkgdocdir}
+ %{_pkgdocdir}/NEWS
+ %{_pkgdocdir}/README
++%{_pkgdocdir}/COPYING*
+ %{_libdir}/libmpfr.so.6*
+ 
+ %files devel
+
+base-commit: 62bd2cdcc23b1a355ddcb839a66eaf8955585547
+-- 
+2.46.2
+
