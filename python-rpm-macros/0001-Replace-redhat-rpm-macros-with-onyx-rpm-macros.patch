@@ -1,0 +1,28 @@
+From 637bc26f013de2bf74779664be8491e936ec858f Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:16:40 +0000
+Subject: [PATCH] Replace redhat-rpm-macros with onyx-rpm-macros
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ python-rpm-macros.spec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/python-rpm-macros.spec b/python-rpm-macros.spec
+index a2e5ca0..04fe590 100644
+--- a/python-rpm-macros.spec
++++ b/python-rpm-macros.spec
+@@ -81,7 +81,7 @@ Summary:        RPM macros for building Python source packages
+ 
+ # For directory structure and flags macros
+ # Versions before 190 contained some brp scripts moved into python-srpm-macros
+-Requires:       redhat-rpm-config >= 190
++Requires:       onyx-rpm-config >= 190
+ 
+ # We bundle our own software here :/
+ Provides:       bundled(python3dist(compileall2)) = %{compileall2_version}
+
+base-commit: ef265656475b091f40dae1d8c229a03257f25bfc
+-- 
+2.46.2
+
