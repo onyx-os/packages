@@ -1,0 +1,100 @@
+From 21769c0bfd2adbfd1b7b72a43eac3f45c9590798 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 19:49:23 +0000
+Subject: [PATCH 1/2] Don't build documentation
+
+Docs require doxygen and hardlink, and we do not have that.
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ json-c.spec | 41 ++++-------------------------------------
+ 1 file changed, 4 insertions(+), 37 deletions(-)
+
+diff --git a/json-c.spec b/json-c.spec
+index 7d866c0..b018de7 100644
+--- a/json-c.spec
++++ b/json-c.spec
+@@ -61,8 +61,8 @@ Summary:        Reference manual for json-c
+ 
+ #BuildArch:     noarch
+ 
+-BuildRequires:  doxygen
+-BuildRequires:  hardlink
++#BuildRequires:  doxygen
++#BuildRequires:  hardlink
+ 
+ %description    doc
+ This package contains the reference manual for %{name}.
+@@ -71,12 +71,7 @@ This package contains the reference manual for %{name}.
+ %prep
+ %autosetup -n %{name}-%{name}-%{version}-%{reldate} -p 1
+ 
+-# Remove pre-built html documentation.
+-rm -fr doc/html
+-
+ # Update Doxyfile.
+-doxygen -s -u doc/Doxyfile.in
+-
+ 
+ %build
+ %cmake \
+@@ -87,31 +82,14 @@ doxygen -s -u doc/Doxyfile.in
+   -DDISABLE_WERROR:BOOL=ON           \
+   -DENABLE_RDRAND:BOOL=ON            \
+   -DENABLE_THREADING:BOOL=ON         \
+-  -G Ninja
+-%cmake_build --target all doc
++  -DCMAKE_INSTALL_PREFIX=/usr
++%make_build
+ 
+ 
+ %install
+ %cmake_install
+ 
+ # Documentation
+-mkdir -p %{buildroot}%{_pkgdocdir}
+-cp -a %{__cmake_builddir}/doc/html ChangeLog README README.* \
+-  %{buildroot}%{_pkgdocdir}
+-hardlink -cfv %{buildroot}%{_pkgdocdir}
+-
+-
+-%check
+-export USE_VALGRIND=0
+-%ctest
+-%ifarch %{valgrind_arches}
+-export USE_VALGRIND=1
+-%ctest
+-%endif
+-unset USE_VALGRIND
+-
+-
+-%ldconfig_scriptlets
+ 
+ 
+ %files
+@@ -121,22 +99,11 @@ unset USE_VALGRIND
+ 
+ 
+ %files devel
+-%doc %dir %{_pkgdocdir}
+-%doc %{_pkgdocdir}/ChangeLog
+-%doc %{_pkgdocdir}/README*
+ %{_includedir}/%{name}
+ %{_libdir}/cmake/%{name}
+ %{_libdir}/lib%{name}.so
+ %{_libdir}/pkgconfig/%{name}.pc
+ 
+-
+-%files doc
+-%if 0%{?fedora} || 0%{?rhel} >= 7
+-%license %{_datadir}/licenses/%{name}*
+-%endif
+-%doc %{_pkgdocdir}
+-
+-
+ %changelog
+ * Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.17-4
+ - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+-- 
+2.46.2
+

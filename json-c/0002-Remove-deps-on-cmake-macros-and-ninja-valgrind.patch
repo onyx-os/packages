@@ -1,0 +1,50 @@
+From e7add61f966f41eeaaa84db50f54f2ac07d7975e Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 19:50:03 +0000
+Subject: [PATCH 2/2] Remove deps on cmake macros and ninja/valgrind
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ json-c.spec | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/json-c.spec b/json-c.spec
+index b018de7..29c6c5b 100644
+--- a/json-c.spec
++++ b/json-c.spec
+@@ -35,10 +35,10 @@ Source0:        %{url}/archive/%{name}-%{version}-%{reldate}.tar.gz
+ 
+ BuildRequires:  cmake
+ BuildRequires:  gcc
+-BuildRequires:  ninja-build
+-%ifarch %{valgrind_arches}
+-BuildRequires:  valgrind
+-%endif
++#BuildRequires:  ninja-build
++#%ifarch %{valgrind_arches}
++#BuildRequires:  valgrind
++#%endif
+ 
+ %description
+ JSON-C implements a reference counting object model that allows you
+@@ -74,7 +74,7 @@ This package contains the reference manual for %{name}.
+ # Update Doxyfile.
+ 
+ %build
+-%cmake \
++cmake \
+   -DBUILD_STATIC_LIBS:BOOL=OFF       \
+   -DCMAKE_BUILD_TYPE:STRING=RELEASE  \
+   -DCMAKE_C_FLAGS_RELEASE:STRING=""  \
+@@ -87,7 +87,7 @@ This package contains the reference manual for %{name}.
+ 
+ 
+ %install
+-%cmake_install
++%make_install
+ 
+ # Documentation
+ 
+-- 
+2.46.2
+
