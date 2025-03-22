@@ -1,0 +1,90 @@
+From c6594b239ea5c499d9a7b59c767e77cf895b5c2a Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 21:20:11 +0000
+Subject: [PATCH] Onyx build dep workarounds
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ quilt.spec | 43 +++++++++++++++++++++----------------------
+ 1 file changed, 21 insertions(+), 22 deletions(-)
+
+diff --git a/quilt.spec b/quilt.spec
+index 085fce2..46149c9 100644
+--- a/quilt.spec
++++ b/quilt.spec
+@@ -13,28 +13,28 @@ Source:         https://download-mirror.savannah.gnu.org/releases/%{name}/%{name
+ BuildArch:      noarch
+ 
+ BuildRequires:  make
+-BuildRequires:  diffstat
+-BuildRequires:  gettext
+-BuildRequires:  gawk
+-BuildRequires:  p7zip
+-BuildRequires:  perl-generators
+-BuildRequires:  perl-podlators
+-BuildRequires:  util-linux-ng
+-BuildRequires:  %{_sbindir}/sendmail
++#BuildRequires:  diffstat
++#BuildRequires:  gettext
++#BuildRequires:  gawk
++#BuildRequires:  p7zip
++#BuildRequires:  perl-generators
++#BuildRequires:  perl-podlators
++#BuildRequires:  util-linux-ng
++#BuildRequires:  %{_sbindir}/sendmail
+ 
+ Requires:       bzip2
+-Requires:       coreutils
+-Requires:       diffstat
++#Requires:       coreutils
++#Requires:       diffstat
+ Requires:       diffutils
+-Requires:       gawk
++#Requires:       gawk
+ Requires:       gzip
+-Requires:       p7zip
+-Requires:       procmail
+-Requires:       rpm-build
+-Requires:       sed
+-Requires:       tar
+-Requires:       util-linux-ng
+-Requires:       %{_sbindir}/sendmail
++#Requires:       p7zip
++#Requires:       procmail
++#Requires:       rpm-build
++#Requires:       sed
++#Requires:       tar
++#Requires:       util-linux-ng
++#Requires:       %{_sbindir}/sendmail
+ 
+ %description
+ These scripts allow one to manage a series of patches by keeping track of the
+@@ -51,20 +51,19 @@ http://www.zip.com.au/~akpm/linux/patches/
+ %build
+ %configure                             \
+   --docdir=%{_pkgdocdir}               \
+-  --with-diffstat=%{_bindir}/diffstat  \
+-  --with-sendmail=%{_sbindir}/sendmail \
++  --without-date \
+ ;
+ %make_build
+ 
+ 
+ %install
+ %make_install BUILD_ROOT=%{buildroot}
+-%{find_lang} %{name}
++#%{find_lang} %{name}
+ mv %{buildroot}%{_pkgdocdir}/* .
+ rm -rf %{buildroot}%{_pkgdocdir}
+ 
+ 
+-%files -f %{name}.lang
++%files
+ %doc README README.MAIL quilt.pdf TODO
+ %license AUTHORS COPYING
+ %{_bindir}/guards
+
+base-commit: b34f205ddbb4e4dea9c5da72995251b25d9b38ca
+-- 
+2.46.2
+
