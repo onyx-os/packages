@@ -1,0 +1,38 @@
+From cda06dd1e1c200cda93a4bd1d1b3051e4a5b8320 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 20:39:21 +0000
+Subject: [PATCH 1/2] Remove some non-required patches
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ make.spec | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/make.spec b/make.spec
+index ed5cec1..20a3544 100644
+--- a/make.spec
++++ b/make.spec
+@@ -31,15 +31,15 @@ Provides:   %(echo make%{version} | tr -d .) = %{version}-%{release}
+ # This gives the user the option of saying --with guile, but defaults to WITHOUT
+ %bcond_with guile
+ 
+-Patch0: make-4.3-getcwd.patch
++#Patch0: make-4.3-getcwd.patch
+ 
+ # Assume we don't have clock_gettime in configure, so that
+ # make is not linked against -lpthread (and thus does not
+ # limit stack to 2MB).
+-Patch1: make-4.0-noclock_gettime.patch
++#Patch1: make-4.0-noclock_gettime.patch
+ 
+ # BZs #142691, #17374
+-Patch2: make-4.3-j8k.patch
++#Patch2: make-4.3-j8k.patch
+ 
+ # autoreconf
+ BuildRequires: make
+
+base-commit: 17beefd2c2dc7d9aa9dd38dcea86627baad25143
+-- 
+2.46.2
+

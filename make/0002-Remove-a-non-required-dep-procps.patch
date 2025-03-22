@@ -1,0 +1,26 @@
+From 7ba17dce175bb422c794c081ed534dd50fbeda9b Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 20:39:31 +0000
+Subject: [PATCH 2/2] Remove a non-required dep (procps)
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ make.spec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/make.spec b/make.spec
+index 20a3544..1c67b4e 100644
+--- a/make.spec
++++ b/make.spec
+@@ -44,7 +44,7 @@ Provides:   %(echo make%{version} | tr -d .) = %{version}-%{release}
+ # autoreconf
+ BuildRequires: make
+ BuildRequires: autoconf, automake, gettext-devel
+-BuildRequires: procps
++#BuildRequires: procps
+ BuildRequires: perl
+ %if %{with guile}
+ BuildRequires: pkgconfig(guile-3.0)
+-- 
+2.46.2
+
