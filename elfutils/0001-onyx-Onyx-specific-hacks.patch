@@ -1,0 +1,314 @@
+From 07ad65ba894073141cb4ceb62c6cb7983cfc8df4 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 19:39:42 +0000
+Subject: [PATCH] [onyx] Onyx specific hacks
+
+Don't compile debuginfod, skip some systemd stuff and a musl fix.
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ elfutils.spec         | 73 +++++++++++++++++++++++++------------------
+ no-fnm-extmatch.patch | 30 ++++++++++++++++++
+ 2 files changed, 73 insertions(+), 30 deletions(-)
+ create mode 100644 no-fnm-extmatch.patch
+
+diff --git a/elfutils.spec b/elfutils.spec
+index ea03564..a60207c 100644
+--- a/elfutils.spec
++++ b/elfutils.spec
+@@ -1,6 +1,8 @@
+ # Rebuild --with static to enable static subpackages
+ # This is *not* supported by elfutils maintainers
+ %bcond_with static
++%bcond_without debuginfod
++%bcond_with check
+ 
+ Name: elfutils
+ Version: 0.192
+@@ -10,7 +12,7 @@ URL: http://elfutils.org/
+ %global source_url ftp://sourceware.org/pub/elfutils/%{version}/
+ License: GPL-3.0-or-later AND (GPL-2.0-or-later OR LGPL-3.0-or-later) AND GFDL-1.3-no-invariants-or-later
+ Source: %{?source_url}%{name}-%{version}.tar.bz2
+-Source1: elfutils-debuginfod.sysusers
++#Source1: elfutils-debuginfod.sysusers
+ Summary: A collection of utilities and DSOs to handle ELF files and DWARF data
+ 
+ # Needed for isa specific Provides and Requires.
+@@ -18,18 +20,20 @@ Summary: A collection of utilities and DSOs to handle ELF files and DWARF data
+ 
+ # eu-stacktrace currently only supports x86_64
+ %ifarch x86_64
+-%global enable_stacktrace 1
++%global enable_stacktrace 0
+ %else
+ %global enable_stacktrace 0
+ %endif
+ 
+ Requires: elfutils-libelf%{depsuffix} = %{version}-%{release}
+ Requires: elfutils-libs%{depsuffix} = %{version}-%{release}
++%if %{with debuginfod}
+ Requires: elfutils-debuginfod-client%{depsuffix} = %{version}-%{release}
++%endif
+ 
+ BuildRequires: gcc
+ # For libstdc++ demangle support
+-BuildRequires: gcc-c++
++#BuildRequires: gcc-c++
+ 
+ BuildRequires: gettext
+ BuildRequires: bison
+@@ -42,13 +46,16 @@ BuildRequires: xz-devel
+ BuildRequires: libzstd-devel
+ 
+ # For debuginfod
++%if 0
+ BuildRequires: pkgconfig(libmicrohttpd) >= 0.9.33
+ BuildRequires: pkgconfig(libcurl) >= 7.29.0
+ BuildRequires: pkgconfig(sqlite3) >= 3.7.17
+ BuildRequires: pkgconfig(libarchive) >= 3.1.2
+ # For debugindod metadata query
+ BuildRequires: pkgconfig(json-c) >= 0.11
++%endif
+ 
++%if %{with check}
+ # For tests need to bunzip2 test files.
+ BuildRequires: bzip2
+ BuildRequires: zstd
+@@ -67,6 +74,7 @@ BuildRequires: rpm-devel
+ BuildRequires: ima-evm-utils-devel
+ BuildRequires: openssl-devel
+ BuildRequires: rpm-sign
++%endif
+ 
+ # For eu-stacktrace
+ %if %{enable_stacktrace}
+@@ -118,6 +126,8 @@ Patch7: elfutils-0.192-ATOMIC_VAR_INIT.patch
+ # New DWARF5 language constants
+ Patch8: elfutils-0.192-more-dwarf5-lang.patch
+ 
++Patch9: no-fnm-extmatch.patch
++
+ %description
+ Elfutils is a collection of utilities, including stack (to show
+ backtraces), nm (for listing symbols from object files), size
+@@ -139,8 +149,10 @@ Requires: default-yama-scope
+ %if 0%{?rhel} >= 8 || 0%{?fedora} >= 20
+ Recommends: elfutils-debuginfod-client%{depsuffix} = %{version}-%{release}
+ %else
++%if %{with debuginfod}
+ Requires: elfutils-debuginfod-client%{depsuffix} = %{version}-%{release}
+ %endif
++%endif
+ 
+ %description libs
+ The elfutils-libs package contains libraries which implement DWARF, ELF,
+@@ -160,8 +172,10 @@ Requires: elfutils-libelf-devel%{depsuffix} = %{version}-%{release}
+ %if 0%{?rhel} >= 8 || 0%{?fedora} >= 20
+ Recommends: elfutils-debuginfod-client-devel%{depsuffix} = %{version}-%{release}
+ %else
++%if %{with debuginfod}
+ Requires: elfutils-debuginfod-client-devel%{depsuffix} = %{version}-%{release}
+ %endif
++%endif
+ 
+ %description devel
+ The elfutils-devel package contains the libraries to create
+@@ -263,6 +277,7 @@ interprocess services, communication and introspection
+ profiling) of processes.
+ %endif
+ 
++%if %{with debuginfod}
+ %package debuginfod-client
+ Summary: Library and command line client for build-id HTTP ELF/DWARF server
+ License: GPL-3.0-or-later AND (GPL-2.0-or-later OR LGPL-3.0-or-later)
+@@ -287,6 +302,7 @@ License: GPL-3.0-or-later
+ Requires: elfutils-libs%{depsuffix} = %{version}-%{release}
+ Requires: elfutils-libelf%{depsuffix} = %{version}-%{release}
+ Requires: elfutils-debuginfod-client%{depsuffix} = %{version}-%{release}
++%if 0
+ BuildRequires: systemd
+ %if %{with_sysusers}
+ BuildRequires: systemd-rpm-macros
+@@ -300,6 +316,7 @@ Requires(postun): systemd
+ %else
+ Requires(pre): shadow-utils
+ %endif
++%endif
+ # To extract .deb files with a bsdtar (= libarchive) subshell
+ Requires: bsdtar
+ 
+@@ -320,6 +337,8 @@ files to remote clients, based on build-id identification.
+ The ELF/DWARF file searching functions in libdwfl can query
+ such servers to download those files on demand.
+ 
++%endif
++
+ %prep
+ %autosetup -p1
+ 
+@@ -335,7 +354,7 @@ find . -name \*.sh ! -perm -0100 -print | xargs chmod +x
+ # the makefiles disable some specific warnings for specific code.
+ # But add -Wformat explicitly for use with -Werror=format-security which
+ # doesn't work without -Wformat (enabled by -Wall).
+-RPM_OPT_FLAGS="${RPM_OPT_FLAGS/-Wall/}"
++RPM_OPT_FLAGS=$(printf "$RPM_OPT_FLAGS" | sed 's/-Wall//')
+ RPM_OPT_FLAGS="${RPM_OPT_FLAGS} -Wformat"
+ 
+ 
+@@ -343,16 +362,8 @@ trap 'cat config.log' EXIT
+ # dist_debuginfod_url is defined in macros.dist. Fedora and CentOS have
+ # URLs pointing to their respective servers.  RHEL and Amazon Linux do
+ # not configure a default server.
+-%configure CFLAGS="$RPM_OPT_FLAGS" \
+-%if "%{?dist_debuginfod_url}"
+-	--enable-debuginfod \
+-	--enable-debuginfod-urls=%{dist_debuginfod_url} \
+-%endif
+-%if %{enable_stacktrace}
+-	--enable-stacktrace \
+-%endif
+-	--enable-debuginfod-ima-verification \
+-	--enable-debuginfod-ima-cert-path=%{_sysconfdir}/keys/ima
++%configure CFLAGS="$RPM_OPT_FLAGS" --enable-debuginfod
++
+ trap '' EXIT
+ %make_build
+ 
+@@ -362,7 +373,7 @@ trap '' EXIT
+ chmod +x ${RPM_BUILD_ROOT}%{_prefix}/%{_lib}/lib*.so*
+ %if %{without static}
+ # We don't want the static libraries
+-rm ${RPM_BUILD_ROOT}%{_prefix}/%{_lib}/lib{elf,dw,asm}.a
++rm ${RPM_BUILD_ROOT}%{_prefix}/%{_lib}/lib*.a
+ %endif
+ 
+ %find_lang %{name}
+@@ -371,21 +382,16 @@ rm ${RPM_BUILD_ROOT}%{_prefix}/%{_lib}/lib{elf,dw,asm}.a
+ install -Dm0644 config/10-default-yama-scope.conf ${RPM_BUILD_ROOT}%{_sysctldir}/10-default-yama-scope.conf
+ %endif
+ 
+-install -Dm0644 config/debuginfod.service ${RPM_BUILD_ROOT}%{_unitdir}/debuginfod.service
+-install -Dm0644 config/debuginfod.sysconfig ${RPM_BUILD_ROOT}%{_sysconfdir}/sysconfig/debuginfod
+-mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/cache/debuginfod
+-touch ${RPM_BUILD_ROOT}%{_localstatedir}/cache/debuginfod/debuginfod.sqlite
+-
+-%if %{with_sysusers}
+-install -Dm0644 %{SOURCE1} %{buildroot}%{_sysusersdir}/elfutils-debuginfod.conf
+-%endif
+-
+ %check
+ # Record some build root versions in build.log
++%if %{with check}
+ uname -r; rpm -q binutils gcc glibc || true
+ 
+ %make_build check || (cat tests/test-suite.log; false)
+ 
++%endif
++
++%if 0
+ # Only the latest Fedora and EPEL have these scriptlets,
+ # older Fedora and plain RHEL don't.
+ %if 0%{?ldconfig_scriptlets:1}
+@@ -410,6 +416,8 @@ if [ -x /usr/lib/systemd/systemd-sysctl ] ; then
+ fi
+ %endif
+ 
++%endif
++
+ %files
+ %license COPYING COPYING-GPLV2 COPYING-LGPLV3 doc/COPYING-GFDL
+ %doc README TODO CONTRIBUTING
+@@ -489,6 +497,7 @@ fi
+ %{_sysctldir}/10-default-yama-scope.conf
+ %endif
+ 
++%if %{with debuginfod}
+ %files debuginfod-client
+ %{_libdir}/libdebuginfod-%{version}.so
+ %{_libdir}/libdebuginfod.so.*
+@@ -496,10 +505,8 @@ fi
+ %{_mandir}/man1/debuginfod-find.1*
+ %{_mandir}/man7/debuginfod*.7*
+ %config(noreplace) %{_sysconfdir}/profile.d/*
+-%if "%{?dist_debuginfod_url}"
+-%config(noreplace) %{_sysconfdir}/debuginfod/*
++#%config(noreplace) %{_sysconfdir}/debuginfod/*
+ %config(noreplace) %{_datadir}/fish/vendor_conf.d/*
+-%endif
+ 
+ %files debuginfod-client-devel
+ %{_libdir}/pkgconfig/libdebuginfod.pc
+@@ -508,18 +515,21 @@ fi
+ %{_libdir}/libdebuginfod.so
+ 
+ %files debuginfod
+-%{_bindir}/debuginfod
++#%{_bindir}/debuginfod
++%if 0
+ %config(noreplace) %{_sysconfdir}/sysconfig/debuginfod
+ %{_unitdir}/debuginfod.service
++%endif
+ %if %{with_sysusers}
+ %{_sysusersdir}/elfutils-debuginfod.conf
+ %endif
+ %{_mandir}/man8/debuginfod*.8*
+ 
+ 
+-%dir %attr(0700,debuginfod,debuginfod) %{_localstatedir}/cache/debuginfod
+-%ghost %attr(0600,debuginfod,debuginfod) %{_localstatedir}/cache/debuginfod/debuginfod.sqlite
++#%dir %attr(0700,debuginfod,debuginfod) %{_localstatedir}/cache/debuginfod
++#%ghost %attr(0600,debuginfod,debuginfod) %{_localstatedir}/cache/debuginfod/debuginfod.sqlite
+ 
++%if 0
+ %pre debuginfod
+ %if %{with_sysusers}
+ %sysusers_create_compat %{SOURCE1}
+@@ -537,6 +547,9 @@ exit 0
+ %postun debuginfod
+ %systemd_postun_with_restart debuginfod.service
+ 
++%endif
++%endif
++
+ %changelog
+ 
+ * Mon Dec 2 2024 Mark Wielaard <mjw@fedoraproject.org> - 0.192-7
+diff --git a/no-fnm-extmatch.patch b/no-fnm-extmatch.patch
+new file mode 100644
+index 0000000..e6498d8
+--- /dev/null
++++ b/no-fnm-extmatch.patch
+@@ -0,0 +1,30 @@
++Index: elfutils-0.192/src/elfcompress.c
++===================================================================
++--- elfutils-0.192.orig/src/elfcompress.c
+++++ elfutils-0.192/src/elfcompress.c
++@@ -37,6 +37,10 @@
++ #include "libeu.h"
++ #include "printversion.h"
++ 
+++#ifndef FNM_EXTMATCH
+++#define FNM_EXTMATCH 0
+++#endif
+++
++ /* Name and version of program.  */
++ ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
++ 
++Index: elfutils-0.192/src/strip.c
++===================================================================
++--- elfutils-0.192.orig/src/strip.c
+++++ elfutils-0.192/src/strip.c
++@@ -45,6 +45,10 @@
++ #include <system.h>
++ #include <printversion.h>
++ 
+++#ifndef FNM_EXTMATCH
+++#define FNM_EXTMATCH 0
+++#endif
+++
++ typedef uint8_t GElf_Byte;
++ 
++ /* Name and version of program.  */
+-- 
+2.46.2
+
