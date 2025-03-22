@@ -1,0 +1,57 @@
+From b45d91ec1d1de0988361e983a15ef2cb124fa067 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sat, 22 Mar 2025 20:00:56 +0000
+Subject: [PATCH] Remove some build deps and don't compile tests
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ fmt.spec | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
+
+diff --git a/fmt.spec b/fmt.spec
+index 320bf14..0a35ef2 100644
+--- a/fmt.spec
++++ b/fmt.spec
+@@ -6,11 +6,11 @@ License:        MIT
+ Summary:        Small, safe and fast formatting library for C++
+ URL:            https://github.com/fmtlib/%{name}
+ Source0:        %{url}/archive/%{version}.tar.gz
+-Patch0:         0001-Address-build-failures-when-using-Tip-of-Tree-clang..patch
++#Patch0:         0001-Address-build-failures-when-using-Tip-of-Tree-clang..patch
+ BuildRequires:  cmake
+ BuildRequires:  gcc
+-BuildRequires:  gcc-c++
+-BuildRequires:  ninja-build
++#BuildRequires:  gcc-c++
++#BuildRequires:  ninja-build
+ 
+ # This package replaces the old name of cppformat
+ Provides:       cppformat = %{?epoch:%{epoch}:}%{version}-%{release}
+@@ -37,18 +37,17 @@ This package contains the header file for using %{name}.
+ %autosetup -p1
+ 
+ %build
+-%cmake -G Ninja \
++%cmake \
+     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+     -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON \
+     -DFMT_CMAKE_DIR:STRING=%{_libdir}/cmake/%{name} \
+-    -DFMT_LIB_DIR:STRING=%{_libdir}
+-%cmake_build
++    -DFMT_LIB_DIR:STRING=%{_libdir} \
++    -DCMAKE_INSTALL_PREFIX=/usr \
++    -DBUILD_SHARED_LIBS=TRUE -DFMT_TEST=FALSE
++%make_build
+ 
+ %install
+-%cmake_install
+-
+-%check
+-%ctest
++%make_install
+ 
+ %files
+ %license LICENSE
+-- 
+2.46.2
+
