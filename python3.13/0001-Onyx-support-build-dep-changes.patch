@@ -1,4 +1,4 @@
-From 6ffc5ac7e5b6e64a444c0647e5675212ba7a9751 Mon Sep 17 00:00:00 2001
+From 8c316e3e0fd1829ed44a428e11b90ca91b7e1aad Mon Sep 17 00:00:00 2001
 From: Pedro Falcato <pedro.falcato@gmail.com>
 Date: Sat, 22 Mar 2025 21:18:32 +0000
 Subject: [PATCH] Onyx support (+ build dep changes)
@@ -10,12 +10,12 @@ Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
  .pc/.version               |   1 +
  .pc/applied-patches        |   2 +
  bldshared.patch            |  31 ++++++++++
- fixup.patch                |  13 ++++
- onyx-support.patch         |  22 +++++++
+ fixup.patch                |  13 +++++
+ onyx-support.patch         |  22 ++++++++
  platform-triplet-fix.patch |  20 +++++++
- platform-triplet.patch     |  26 ++++++++
- python3.13.spec            | 118 ++++++++++++++++++++-----------------
- 10 files changed, 181 insertions(+), 54 deletions(-)
+ platform-triplet.patch     |  26 +++++++++
+ python3.13.spec            | 112 ++++++++++++++++++++-----------------
+ 10 files changed, 178 insertions(+), 51 deletions(-)
  create mode 100644 .pc/.quilt_patches
  create mode 100644 .pc/.quilt_series
  create mode 100644 .pc/.version
@@ -198,7 +198,7 @@ index 0000000..870d141
 + /*
 +  * BEGIN of Linux block
 diff --git a/python3.13.spec b/python3.13.spec
-index aade60b..6eb9a31 100644
+index aade60b..956134a 100644
 --- a/python3.13.spec
 +++ b/python3.13.spec
 @@ -51,7 +51,7 @@ License: Python-2.0.1
@@ -252,9 +252,8 @@ index aade60b..6eb9a31 100644
 +# TODO: PACKAGING: bz2, libffi, libuuid, ncurses, pkgconfig, readline, zstd, zstd
  BuildRequires: autoconf
 -BuildRequires: bluez-libs-devel
--BuildRequires: bzip2-devel
 +#BuildRequires: bluez-libs-devel
-+#BuildRequires: bzip2-devel
+ BuildRequires: bzip2-devel
  # See the runtime requirement in the -libs subpackage
 -BuildRequires: expat-devel >= 2.6
 +BuildRequires: expat >= 2.6
@@ -276,12 +275,10 @@ index aade60b..6eb9a31 100644
 +#BuildRequires: libuuid-devel
  BuildRequires: make
 -BuildRequires: mpdecimal-devel
--BuildRequires: ncurses-devel
 +#BuildRequires: mpdecimal-devel
-+#BuildRequires: ncurses-devel
+ BuildRequires: ncurses-devel
  BuildRequires: openssl-devel
--BuildRequires: pkgconfig
-+#BuildRequires: pkgconfig
+ BuildRequires: pkgconfig
  BuildRequires: python-rpm-macros
 -BuildRequires: readline-devel
 -BuildRequires: redhat-rpm-config >= 127

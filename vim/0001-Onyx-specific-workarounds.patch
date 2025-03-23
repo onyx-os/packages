@@ -1,15 +1,15 @@
-From e62958b784044cf1fa24025853aa08677fc12874 Mon Sep 17 00:00:00 2001
+From 72a86bc710a4c270ee1d52ea4826e2fa190fb4bc Mon Sep 17 00:00:00 2001
 From: Pedro Falcato <pedro.falcato@gmail.com>
 Date: Sat, 22 Mar 2025 21:41:18 +0000
 Subject: [PATCH] Onyx specific workarounds
 
 Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
 ---
- vim.spec | 47 +++++++++++++++++++++++++----------------------
- 1 file changed, 25 insertions(+), 22 deletions(-)
+ vim.spec | 43 +++++++++++++++++++++++--------------------
+ 1 file changed, 23 insertions(+), 20 deletions(-)
 
 diff --git a/vim.spec b/vim.spec
-index ba1aa988..e1f4c4e9 100644
+index ba1aa988..75c6344c 100644
 --- a/vim.spec
 +++ b/vim.spec
 @@ -1,4 +1,4 @@
@@ -76,7 +76,7 @@ index ba1aa988..e1f4c4e9 100644
  
  # selinux support
  %if %{WITH_SELINUX}
-@@ -142,22 +146,22 @@ BuildRequires: libtool
+@@ -142,7 +146,7 @@ BuildRequires: libtool
  
  # for lua plugin
  %if "%{withlua}" == "1"
@@ -85,10 +85,8 @@ index ba1aa988..e1f4c4e9 100644
  %endif
  
  # uses make
- BuildRequires: make
- # screen handling library
--BuildRequires: ncurses-devel
-+#BuildRequires: ncurses-devel
+@@ -151,10 +155,10 @@ BuildRequires: make
+ BuildRequires: ncurses-devel
  # for perl plugin
  %if "%{withperl}" == "1"
 -BuildRequires: perl-devel
@@ -101,11 +99,7 @@ index ba1aa988..e1f4c4e9 100644
 +#BuildRequires: perl(ExtUtils::ParseXS)
  %endif
  # for python plugin
--BuildRequires: python3-devel
-+#BuildRequires: python3-devel
- 
- # for ruby plugin
- %if "%{withruby}" == "1"
+ BuildRequires: python3-devel
 @@ -183,7 +187,6 @@ Requires: %{name}-data = %{epoch}:%{version}-%{release}
  Requires: %{name}-filesystem
  # the hexdump binary was part of the package for long time, ship it with it

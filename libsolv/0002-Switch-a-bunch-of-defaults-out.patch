@@ -1,4 +1,4 @@
-From f9672fa5fbd4c5f2772b13efe6eb2bc13c6e7211 Mon Sep 17 00:00:00 2001
+From ccdf9e00c2d71d1db3cd940cb6936ba3e7018088 Mon Sep 17 00:00:00 2001
 From: Pedro Falcato <pedro.falcato@gmail.com>
 Date: Sat, 22 Mar 2025 20:19:09 +0000
 Subject: [PATCH 2/2] Switch a bunch of defaults out
@@ -9,7 +9,7 @@ Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
  1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/libsolv.spec b/libsolv.spec
-index 29696f1..5e13670 100644
+index b01902c..c7107be 100644
 --- a/libsolv.spec
 +++ b/libsolv.spec
 @@ -1,8 +1,8 @@

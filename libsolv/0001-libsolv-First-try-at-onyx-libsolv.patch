@@ -1,42 +1,30 @@
-From 01ac63393d5b498d9d3a4ab3114d21a42423aa61 Mon Sep 17 00:00:00 2001
+From a71ba6b33cf58e41000e6d6bb8d9a855ba10c543 Mon Sep 17 00:00:00 2001
 From: Pedro Falcato <pedro.falcato@gmail.com>
 Date: Tue, 10 Dec 2024 00:30:18 +0000
 Subject: [PATCH 1/2] libsolv: First try at onyx libsolv
 
 Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
 ---
- libsolv.spec | 45 ++++++++++++++++++---------------------------
- 1 file changed, 18 insertions(+), 27 deletions(-)
+ libsolv.spec | 37 ++++++++++++++-----------------------
+ 1 file changed, 14 insertions(+), 23 deletions(-)
 
 diff --git a/libsolv.spec b/libsolv.spec
-index 314524a..29696f1 100644
+index 314524a..b01902c 100644
 --- a/libsolv.spec
 +++ b/libsolv.spec
-@@ -34,17 +34,17 @@ License:        BSD-3-Clause
- URL:            https://github.com/openSUSE/libsolv
+@@ -35,9 +35,9 @@ URL:            https://github.com/openSUSE/libsolv
  Source:         %{url}/archive/%{version}/%{name}-%{version}.tar.gz
  
--BuildRequires:  cmake
+ BuildRequires:  cmake
 -BuildRequires:  gcc-c++
 -BuildRequires:  ninja-build
 -BuildRequires:  pkgconfig(rpm)
--BuildRequires:  zlib-devel
-+#BuildRequires:  cmake
 +#BuildRequires:  gcc-c++
 +#BuildRequires:  ninja-build
 +#BuildRequires:  pkgconfig(rpm)
-+#BuildRequires:  zlib-devel
+ BuildRequires:  zlib-devel
  # -DWITH_LIBXML2=ON
  BuildRequires:  libxml2-devel
- # -DENABLE_LZMA_COMPRESSION=ON
--BuildRequires:  xz-devel
-+#BuildRequires:  xz-devel
- # -DENABLE_BZIP2_COMPRESSION=ON
--BuildRequires:  bzip2-devel
-+#BuildRequires:  bzip2-devel
- %if %{with zstd}
- # -DENABLE_ZSTD_COMPRESSION=ON
- BuildRequires:  libzstd-devel
 @@ -141,13 +141,13 @@ Python 3 version.
  %autosetup -p1
  
