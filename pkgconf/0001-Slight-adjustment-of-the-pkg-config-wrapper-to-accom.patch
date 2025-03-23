@@ -1,0 +1,42 @@
+From 5bce58e50c887d91f060e9de638d78f907b7e27f Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sun, 23 Mar 2025 03:11:49 +0000
+Subject: [PATCH] Slight adjustment of the pkg-config wrapper to accomodate for
+ Onyx
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ pkg-config.in | 2 +-
+ pkgconf.spec  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pkg-config.in b/pkg-config.in
+index 0d12767..fb9f1e6 100644
+--- a/pkg-config.in
++++ b/pkg-config.in
+@@ -3,6 +3,6 @@
+ # Multilib safe wrapper for pkg-config to call correct platform-specific version of pkg-config
+ 
+ ## Vendored definition of %_target_platform from redhat-rpm-config to avoid depending on it
+-TARGET_PLATFORM=$(rpm --eval '%{_target_cpu}-%{_vendor}-%{_target_os}%{?_gnu}')
++TARGET_PLATFORM=$(rpm --eval '%{_target_cpu}-%{_vendor}')
+ 
+ exec "@PKGCONF_BINDIR@/${TARGET_PLATFORM}-pkg-config" "$@"
+diff --git a/pkgconf.spec b/pkgconf.spec
+index 8d3dbd1..c9c1ab5 100644
+--- a/pkgconf.spec
++++ b/pkgconf.spec
+@@ -201,7 +201,7 @@ rm -rf %{buildroot}%{_datadir}/aclocal
+ 
+ %files -n lib%{name}
+ %license COPYING
+-%{_libdir}/lib%{name}*.so.%{libsomajor}{,.*}
++%{_libdir}/lib%{name}*.so.%{libsomajor}*
+ 
+ %files -n lib%{name}-devel
+ %{_libdir}/lib%{name}*.so
+
+base-commit: c9f01eb77bd52bbce28e1aa9157dd36dd869519e
+-- 
+2.46.2
+
