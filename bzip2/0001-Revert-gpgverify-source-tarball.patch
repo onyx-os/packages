@@ -1,0 +1,174 @@
+From 001bef47788096030a3c097964d1c800a6093e59 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sun, 23 Mar 2025 22:45:51 +0000
+Subject: [PATCH] Revert "gpgverify source tarball"
+
+This reverts commit ef4bca86f9fb827688c2b73fd00d598ed894921e.
+Onyx does not support gpgverify yet.
+---
+ bzip2.spec                      |  10 ----------
+ gpgkey-5C1D1AA44BE649DE760A.gpg | Bin 5236 -> 0 bytes
+ sources                         |   1 -
+ 3 files changed, 11 deletions(-)
+ delete mode 100644 gpgkey-5C1D1AA44BE649DE760A.gpg
+
+diff --git a/bzip2.spec b/bzip2.spec
+index ca1b861..335cb6f 100644
+--- a/bzip2.spec
++++ b/bzip2.spec
+@@ -9,11 +9,6 @@ URL: https://sourceware.org/bzip2
+ #Source0: http://www.bzip.org/%{version}/%{name}-%{version}.tar.gz
+ Source0: https://sourceware.org/pub/bzip2/%{name}-%{version}.tar.gz
+ Source1: bzip2.pc
+-Source2: https://sourceware.org/pub/bzip2/%{name}-%{version}.tar.gz.sig
+-# https://sourceware.org/bzip2/downloads.html links to the gpg key
+-# https://sourceware.org/pub/bzip2/gpgkey-5C1D1AA44BE649DE760A.gpg
+-# with which the tarballs are signed
+-Source3: gpgkey-5C1D1AA44BE649DE760A.gpg
+ 
+ Patch0: bzip2-saneso.patch
+ Patch1: bzip2-cflags.patch
+@@ -22,7 +17,6 @@ Patch3: man_gzipdiff.patch
+ 
+ BuildRequires: gcc
+ BuildRequires: make
+-BuildRequires: gnupg2
+ 
+ %description
+ Bzip2 is a freely available, patent-free, high quality data compressor.
+@@ -56,7 +50,6 @@ Summary: Libraries for applications using bzip2
+ Static libraries for applications using the bzip2 compression format.
+ 
+ %prep
+-%{gpgverify} --keyring='%{SOURCE3}' --signature='%{SOURCE2}' --data='%{SOURCE0}'
+ %setup -q
+ %patch -P0 -p1
+ %patch -P1 -p1
+@@ -140,9 +133,6 @@ ln -s bzgrep.1 $RPM_BUILD_ROOT%{_mandir}/man1/bzfgrep.1
+ * Fri Jan 19 2024 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.8-17
+ - Rebuilt for https://fedoraproject.org/wiki/Fedora_40_Mass_Rebuild
+ 
+-* Thu Jul 20 2023 Stewart Smith <trawets@amazon.com> - 1.0.8-16
+-- gpgverify source tarball
+-
+ * Wed Jul 19 2023 Fedora Release Engineering <releng@fedoraproject.org> - 1.0.8-15
+ - Rebuilt for https://fedoraproject.org/wiki/Fedora_39_Mass_Rebuild
+ 
+diff --git a/gpgkey-5C1D1AA44BE649DE760A.gpg b/gpgkey-5C1D1AA44BE649DE760A.gpg
+deleted file mode 100644
+index 5a460ba1a87debe8239ed75d4186ce29ef670c15..0000000000000000000000000000000000000000
+GIT binary patch
+literal 0
+HcmV?d00001
+
+literal 5236
+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
+IGmq;3FEehL&;S4c
+
+diff --git a/sources b/sources
+index 4363d4b..3aca83c 100644
+--- a/sources
++++ b/sources
+@@ -1,2 +1 @@
+ SHA512 (bzip2-1.0.8.tar.gz) = 083f5e675d73f3233c7930ebe20425a533feedeaaa9d8cc86831312a6581cefbe6ed0d08d2fa89be81082f2a5abdabca8b3c080bf97218a1bd59dc118a30b9f3
+-SHA512 (bzip2-1.0.8.tar.gz.sig) = 4a4a3fa0ec1c10a704b9870e8e629fd007cca55184423c6bfc3049a702fb41e4aeb73bfe9ca7442c27d32d278f1f34f27523a6be67d35b37896acdded12bf40d
+
+base-commit: 2f27472c9f8b15690d96c3bbb75aaeee90580e2b
+-- 
+2.46.2
+
