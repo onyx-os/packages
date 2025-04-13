@@ -1,0 +1,2 @@
+origin: https://src.fedoraproject.org/rpms/shadow-utils.git
+base-commit: a7f68f91584ffdd51a38b20c562e319e060ac53c

@@ -1,0 +1,39 @@
+From 643922b8941f6cbedad02a27334b826a78dda679 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sun, 13 Apr 2025 00:26:41 +0000
+Subject: [PATCH 2/3] Add non-PAM files
+
+Add files only included in non-PAM builds
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ shadow-utils.spec | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/shadow-utils.spec b/shadow-utils.spec
+index 103cd24..5feb4f8 100644
+--- a/shadow-utils.spec
++++ b/shadow-utils.spec
+@@ -193,6 +193,8 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/libsubid.a
+ %files -f shadow.lang
+ %doc NEWS doc/HOWTO README
+ %license gpl-2.0.txt shadow-bsd.txt
++%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/limits
++%attr(0644,root,root) %config(noreplace) %{_sysconfdir}/login.access
+ %attr(0644,root,root)   %config(noreplace) %{_sysconfdir}/login.defs
+ %attr(0644,root,root)   %config(noreplace) %{_sysconfdir}/default/useradd
+ %{_bindir}/sg
+@@ -239,6 +241,10 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/libsubid.a
+ %{_mandir}/man8/lastlog.8*
+ %{_mandir}/man8/vipw.8*
+ %{_mandir}/man8/vigr.8*
++%{_mandir}/man5/limits.5*
++%{_mandir}/man5/login.access.5*
++%{_mandir}/man5/porttime.5*
++%{_mandir}/man5/suauth.5*
+ 
+ %files subid
+ %{_libdir}/libsubid.so.*
+-- 
+2.46.2
+

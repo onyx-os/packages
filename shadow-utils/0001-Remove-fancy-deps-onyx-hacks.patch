@@ -1,0 +1,117 @@
+From c8620b2714cf7a1190fe629f0b8fe0f9c8190aca Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sun, 13 Apr 2025 00:05:58 +0000
+Subject: [PATCH 1/3] Remove fancy deps, onyx hacks
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ shadow-utils.spec | 44 +++++++++-----------------------------------
+ 1 file changed, 9 insertions(+), 35 deletions(-)
+
+diff --git a/shadow-utils.spec b/shadow-utils.spec
+index b835dd5..103cd24 100644
+--- a/shadow-utils.spec
++++ b/shadow-utils.spec
+@@ -26,34 +26,18 @@ Patch0: shadow-4.15.0-manfix.patch
+ Patch1: shadow-4.17.4-account-tools-setuid.patch
+ 
+ ### Dependencies ###
+-Requires: audit-libs >= 1.6.5
+-Requires: libselinux >= 1.25.2-1
+-Requires: pam-libs
+-Requires: setup
+ 
+ ### Build Dependencies ###
+-BuildRequires: audit-libs-devel >= 1.6.5
+ BuildRequires: autoconf
+ BuildRequires: automake
+ BuildRequires: bison
+-BuildRequires: docbook-dtds
+-BuildRequires: docbook-style-xsl
+-BuildRequires: flex
++#Not yet packaged
++#BuildRequires: flex
+ BuildRequires: gcc
+ BuildRequires: gettext-devel
+-BuildRequires: git
+-BuildRequires: itstool
+-BuildRequires: libacl-devel
+-BuildRequires: libattr-devel
+-BuildRequires: libeconf-devel
+-BuildRequires: libselinux-devel >= 1.25.2-1
+-BuildRequires: libsemanage-devel
+-BuildRequires: libtool
+-BuildRequires: libxcrypt-devel
+-BuildRequires: libxslt
++#Not yet packages
++#BuildRequires: git
+ BuildRequires: make
+-BuildRequires: pam
+-BuildRequires: pam-devel
+ 
+ ### Provides ###
+ Provides: shadow = %{epoch}:%{version}-%{release}
+@@ -114,19 +98,15 @@ cp -a %{SOURCE6} man/login.defs.d/HOME_MODE.xml
+ rm lib/getdate.c
+ 
+ %build
+-autoreconf
++autoreconf -fiv
+ %configure \
+ 	--disable-account-tools-setuid \
+ 	--enable-lastlog \
+ 	--enable-logind=no \
+-	--enable-man \
+         --enable-shadowgrp \
+         --enable-shared \
+-        --with-audit \
+         --with-bcrypt \
+         --with-group-name-max-length=32 \
+-        --with-libpam \
+-        --with-selinux \
+         --with-sha-crypt \
+         --with-yescrypt \
+         --without-libbsd \
+@@ -137,11 +117,13 @@ autoreconf
+ 
+ %install
+ %make_install gnulocaledir=$RPM_BUILD_ROOT%{_datadir}/locale MKINSTALLDIRS=`pwd`/mkinstalldirs
++# HACK: For some reason our build doesn't install man pages by default...
++%make_install -C man/ install-man gnulocaledir=$RPM_BUILD_ROOT%{_datadir}/locale MKINSTALLDIRS=`pwd`/mkinstalldirs
+ install -d -m 755 $RPM_BUILD_ROOT%{_sysconfdir}/default
+ install -p -c -m 0644 %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/login.defs
+ install -p -c -m 0600 %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/default/useradd
+-install -d -m 755 $RPM_BUILD_ROOT%{_pam_confdir}
+-install -m 644 %{SOURCE7} $RPM_BUILD_ROOT%{_pam_confdir}/passwd
++#install -d -m 755 $RPM_BUILD_ROOT%{_pam_confdir}
++#install -m 644 %{SOURCE7} $RPM_BUILD_ROOT%{_pam_confdir}/passwd
+ 
+ 
+ ln -s useradd $RPM_BUILD_ROOT%{_sbindir}/adduser
+@@ -188,13 +170,6 @@ rm $RPM_BUILD_ROOT%{_mandir}/man8/faillog.*
+ rm $RPM_BUILD_ROOT%{_mandir}/*/man8/faillog.*
+ 
+ # Remove PAM service files we don't use.
+-rm $RPM_BUILD_ROOT%{_pam_confdir}/chfn
+-rm $RPM_BUILD_ROOT%{_pam_confdir}/chpasswd
+-rm $RPM_BUILD_ROOT%{_pam_confdir}/chsh
+-rm $RPM_BUILD_ROOT%{_pam_confdir}/groupmems
+-rm $RPM_BUILD_ROOT%{_pam_confdir}/login
+-rm $RPM_BUILD_ROOT%{_pam_confdir}/newusers
+-rm $RPM_BUILD_ROOT%{_pam_confdir}/su
+ 
+ find $RPM_BUILD_ROOT%{_mandir} -depth -type d -empty -delete
+ %find_lang shadow
+@@ -220,7 +195,6 @@ rm -f $RPM_BUILD_ROOT/%{_libdir}/libsubid.a
+ %license gpl-2.0.txt shadow-bsd.txt
+ %attr(0644,root,root)   %config(noreplace) %{_sysconfdir}/login.defs
+ %attr(0644,root,root)   %config(noreplace) %{_sysconfdir}/default/useradd
+-%config(noreplace) %{_pam_confdir}/passwd
+ %{_bindir}/sg
+ %attr(4755,root,root) %{_bindir}/chage
+ %attr(4755,root,root) %{_bindir}/gpasswd
+
+base-commit: a7f68f91584ffdd51a38b20c562e319e060ac53c
+-- 
+2.46.2
+
