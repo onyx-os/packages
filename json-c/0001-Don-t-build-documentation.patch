@@ -1,4 +1,4 @@
-From 21769c0bfd2adbfd1b7b72a43eac3f45c9590798 Mon Sep 17 00:00:00 2001
+From eaa8e587bda8d5a34ee82b2b2c2bd6287a815e74 Mon Sep 17 00:00:00 2001
 From: Pedro Falcato <pedro.falcato@gmail.com>
 Date: Sat, 22 Mar 2025 19:49:23 +0000
 Subject: [PATCH 1/2] Don't build documentation
@@ -11,7 +11,7 @@ Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
  1 file changed, 4 insertions(+), 37 deletions(-)
 
 diff --git a/json-c.spec b/json-c.spec
-index 7d866c0..b018de7 100644
+index 1f160fb..4f7cfac 100644
 --- a/json-c.spec
 +++ b/json-c.spec
 @@ -61,8 +61,8 @@ Summary:        Reference manual for json-c
@@ -93,8 +93,10 @@ index 7d866c0..b018de7 100644
 -
 -
  %changelog
- * Thu Jul 18 2024 Fedora Release Engineering <releng@fedoraproject.org> - 0.17-4
- - Rebuilt for https://fedoraproject.org/wiki/Fedora_41_Mass_Rebuild
+ * Fri Jan 17 2025 Fedora Release Engineering <releng@fedoraproject.org> - 0.18-2
+ - Rebuilt for https://fedoraproject.org/wiki/Fedora_42_Mass_Rebuild
+
+base-commit: 58075f70bcf57a2ef3121894901a71a3df45e6d5
 -- 
 2.46.2
 

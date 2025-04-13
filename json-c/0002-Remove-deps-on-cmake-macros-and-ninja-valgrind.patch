@@ -1,4 +1,4 @@
-From e7add61f966f41eeaaa84db50f54f2ac07d7975e Mon Sep 17 00:00:00 2001
+From 4d70ebf5adaaffc984c24bcbfda92a4f449eda16 Mon Sep 17 00:00:00 2001
 From: Pedro Falcato <pedro.falcato@gmail.com>
 Date: Sat, 22 Mar 2025 19:50:03 +0000
 Subject: [PATCH 2/2] Remove deps on cmake macros and ninja/valgrind
@@ -9,7 +9,7 @@ Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/json-c.spec b/json-c.spec
-index b018de7..29c6c5b 100644
+index 4f7cfac..8580a44 100644
 --- a/json-c.spec
 +++ b/json-c.spec
 @@ -35,10 +35,10 @@ Source0:        %{url}/archive/%{name}-%{version}-%{reldate}.tar.gz
