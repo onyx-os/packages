@@ -1,0 +1,47 @@
+From cf3be9e4b7d8bb33e84637fc14f8cfd1a19cd371 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Sun, 20 Apr 2025 19:19:34 +0000
+Subject: [PATCH] ncurses: Enable tinfo
+
+readline requires tinfo, thus enable it.
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ ncurses.spec | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ncurses.spec b/ncurses.spec
+index 481f51a..9e77d6c 100644
+--- a/ncurses.spec
++++ b/ncurses.spec
+@@ -1,7 +1,7 @@
+ Name:		ncurses
+ Summary: 	Ncurses support utilities
+ Version:	6.3
+-Release:	1%{?dist}
++Release:	3%{?dist}
+ License:	MIT-open-group
+ Source:		https://ftp.gnu.org/gnu/%{name}/%{name}-%{version}.tar.gz
+ Patch0:		ncurses-onyx.patch
+@@ -81,14 +81,14 @@ The ncurses-static package includes static libraries of the ncurses library.
+ %build
+ export CFLAGS="$CFLAGS -D_GNU_SOURCE"
+ %configure --with-shared --with-cxx-binding --with-cxx-shared --enable-widec \
+---with-pkg-config-libdir=%{_libdir}/pkgconfig --enable-pc-files
++--with-pkg-config-libdir=%{_libdir}/pkgconfig --enable-pc-files --with-termlib=tinfo
+ %make_build
+ 
+ %install
+ %make_install
+ 
+ echo "INPUT(-lncursesw)" > $RPM_BUILD_ROOT%{_libdir}/libncurses.so
+-for lib in tic tinfo; do
++for lib in tic; do
+ echo "INPUT(-lncursesw)" > $RPM_BUILD_ROOT%{_libdir}/lib$lib.so
+ #ln -sv libncursesw.so.6 
+ done
+
+base-commit: 290603726c2c3f031e190bb828b1ac43383b88f6
+-- 
+2.46.2
+
