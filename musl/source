@@ -1,0 +1,2 @@
+origin: https://github.com/onyx-os/musl.git
+base-commit: 2bacdc7d7d7f84f9143b614527c0991b1177cd18
