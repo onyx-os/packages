@@ -1,4 +1,4 @@
-From c6594b239ea5c499d9a7b59c767e77cf895b5c2a Mon Sep 17 00:00:00 2001
+From dee7be1bf713b135a94ccaf73a5d36e99e308d1f Mon Sep 17 00:00:00 2001
 From: Pedro Falcato <pedro.falcato@gmail.com>
 Date: Sat, 22 Mar 2025 21:20:11 +0000
 Subject: [PATCH] Onyx build dep workarounds
@@ -9,7 +9,7 @@ Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
  1 file changed, 21 insertions(+), 22 deletions(-)
 
 diff --git a/quilt.spec b/quilt.spec
-index 085fce2..46149c9 100644
+index 2fcbd14..331351b 100644
 --- a/quilt.spec
 +++ b/quilt.spec
 @@ -13,28 +13,28 @@ Source:         https://download-mirror.savannah.gnu.org/releases/%{name}/%{name
@@ -84,7 +84,7 @@ index 085fce2..46149c9 100644
  %license AUTHORS COPYING
  %{_bindir}/guards
 
-base-commit: b34f205ddbb4e4dea9c5da72995251b25d9b38ca
+base-commit: 573312dd750d9f00e07534295a4c283aac162966
 -- 
 2.46.2
 
