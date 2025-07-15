@@ -1,7 +1,7 @@
-From 7ba17dce175bb422c794c081ed534dd50fbeda9b Mon Sep 17 00:00:00 2001
+From 9b3c81708f9ea59f783bcfea30e0661efb1c2696 Mon Sep 17 00:00:00 2001
 From: Pedro Falcato <pedro.falcato@gmail.com>
 Date: Sat, 22 Mar 2025 20:39:31 +0000
-Subject: [PATCH 2/2] Remove a non-required dep (procps)
+Subject: [PATCH 2/3] Remove a non-required dep (procps)
 
 Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
 ---
@@ -9,7 +9,7 @@ Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/make.spec b/make.spec
-index 20a3544..1c67b4e 100644
+index 56e3ae9..a803565 100644
 --- a/make.spec
 +++ b/make.spec
 @@ -44,7 +44,7 @@ Provides:   %(echo make%{version} | tr -d .) = %{version}-%{release}

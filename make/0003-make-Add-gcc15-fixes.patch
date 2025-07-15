@@ -1,0 +1,73 @@
+From 85e84d0197a6725624de63e06bf4d25ee7fdb253 Mon Sep 17 00:00:00 2001
+From: Pedro Falcato <pedro.falcato@gmail.com>
+Date: Tue, 15 Jul 2025 00:02:40 +0000
+Subject: [PATCH 3/3] make: Add gcc15 fixes
+
+Signed-off-by: Pedro Falcato <pedro.falcato@gmail.com>
+---
+ gcc15.patch | 39 +++++++++++++++++++++++++++++++++++++++
+ make.spec   |  2 ++
+ 2 files changed, 41 insertions(+)
+ create mode 100644 gcc15.patch
+
+diff --git a/gcc15.patch b/gcc15.patch
+new file mode 100644
+index 0000000..f185ff3
+--- /dev/null
++++ b/gcc15.patch
+@@ -0,0 +1,39 @@
++--- a/lib/fnmatch.c
+++++ b/lib/fnmatch.c
++@@ -121,7 +121,7 @@ USA.  */
++    whose names are inconsistent.  */
++ 
++ # if !defined _LIBC && !defined getenv
++-extern char *getenv ();
+++extern char *getenv (const char *);
++ # endif
++ 
++ # ifndef errno
++--- a/src/getopt.c
+++++ b/src/getopt.c
++@@ -202,7 +202,7 @@ static char *posixly_correct;
++    whose names are inconsistent.  */
++ 
++ #ifndef getenv
++-extern char *getenv ();
+++extern char *getenv (const char *);
++ #endif
++ 
++ static char *
++--- a/src/getopt.h
+++++ b/src/getopt.h
++@@ -96,14 +96,7 @@ struct option
++ #define optional_argument	2
++ 
++ #if defined (__STDC__) && __STDC__
++-#ifdef __GNU_LIBRARY__
++-/* Many other libraries have conflicting prototypes for getopt, with
++-   differences in the consts, in stdlib.h.  To avoid compilation
++-   errors, only prototype getopt for the GNU C library.  */
++ extern int getopt (int argc, char *const *argv, const char *shortopts);
++-#else /* not __GNU_LIBRARY__ */
++-extern int getopt ();
++-#endif /* __GNU_LIBRARY__ */
++ extern int getopt_long (int argc, char *const *argv, const char *shortopts,
++ 		        const struct option *longopts, int *longind);
++ extern int getopt_long_only (int argc, char *const *argv,
+diff --git a/make.spec b/make.spec
+index a803565..0e49e4f 100644
+--- a/make.spec
++++ b/make.spec
+@@ -31,6 +31,8 @@ Provides:   %(echo make%{version} | tr -d .) = %{version}-%{release}
+ # This gives the user the option of saying --with guile, but defaults to WITHOUT
+ %bcond_with guile
+ 
++Patch0: gcc15.patch
++
+ #Patch0: make-4.3-getcwd.patch
+ 
+ # Assume we don't have clock_gettime in configure, so that
+-- 
+2.46.2
+
